@@ -1,0 +1,2720 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MoneyOS">
+<meta name="theme-color" content="#0F1419">
+<title>MoneyOS — Harry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAFAF7;
+  --surface: #FFFFFF;
+  --surface-elev: #F5F4EE;
+  --ink: #0F1419;
+  --ink-soft: #4A5159;
+  --ink-mute: #8B9199;
+  --line: #E8E6DD;
+  --line-soft: #F0EEE5;
+  --accent: #D97757;
+  --accent-soft: #FAE8DE;
+  --green: #4F7A4A;
+  --green-soft: #E2EDDF;
+  --red: #C44545;
+  --red-soft: #F7DDDC;
+  --gold: #B8893C;
+  --gold-soft: #F4E8CE;
+  --blue: #4A6B8A;
+  --blue-soft: #DDE7F0;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(15,20,25,0.04), 0 4px 12px rgba(15,20,25,0.04);
+  --shadow-lg: 0 4px 20px rgba(15,20,25,0.08);
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Manrope', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: contain;
+}
+
+body {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-bottom: 90px;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  body {
+    max-width: 520px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.05);
+    background: var(--bg);
+  }
+  html { background: #ECEAE0; }
+}
+
+/* ─── HEADER ─── */
+.header {
+  padding: 24px 20px 16px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  font-style: italic;
+}
+
+.brand-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.month-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.month-pill select {
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+}
+
+/* ─── TABS ─── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  z-index: 50;
+  box-shadow: 0 -4px 20px rgba(15,20,25,0.04);
+}
+
+@media (min-width: 768px) {
+  .bottom-nav { max-width: 520px; }
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 8px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--ink-mute);
+  border-radius: 8px;
+  transition: color 0.2s;
+}
+
+.tab-btn.active { color: var(--accent); }
+.tab-btn svg { width: 22px; height: 22px; stroke-width: 1.8; }
+.tab-btn span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* ─── VIEWS ─── */
+.view { display: none; padding: 20px; }
+.view.active { display: block; animation: fadeUp 0.3s ease-out; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+  letter-spacing: 0.01em;
+}
+
+.section-label .count {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-left: 4px;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.card-flat {
+  background: var(--surface-elev);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+/* ─── HERO (Dashboard) ─── */
+.hero {
+  background: linear-gradient(135deg, #0F1419 0%, #1F2A33 100%);
+  color: #FAFAF7;
+  border-radius: 20px;
+  padding: 24px 22px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(217,119,87,0.25) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.hero-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.hero-amount {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 36px;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-amount .unit {
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.6;
+  margin-left: 4px;
+  font-family: var(--font-body);
+}
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-stat-label {
+  font-size: 11px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.hero-stat-value {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ─── KPI ROW ─── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+}
+
+.kpi-label {
+  font-size: 11px;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+.kpi.warn .kpi-value { color: var(--red); }
+.kpi.good .kpi-value { color: var(--green); }
+
+/* ─── PROGRESS BAR ─── */
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.progress-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.progress-fig {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.progress-fig .pct {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--line-soft);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+
+.progress-fill.warn { background: var(--gold); }
+.progress-fill.over { background: var(--red); }
+
+.progress-meta {
+  font-size: 11px;
+  color: var(--ink-mute);
+  margin-top: 6px;
+  font-family: var(--font-mono);
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  padding: 12px 18px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent);
+  padding: 8px 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-full { width: 100%; justify-content: center; }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+
+.fab {
+  position: fixed;
+  bottom: calc(78px + env(safe-area-inset-bottom));
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(217,119,87,0.4);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 300;
+}
+
+@media (min-width: 768px) {
+  .fab { right: calc(50vw - 240px + 20px); }
+}
+
+/* ─── INPUTS ─── */
+.field {
+  margin-bottom: 14px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.toggle-row {
+  display: flex;
+  gap: 6px;
+  background: var(--surface-elev);
+  padding: 4px;
+  border-radius: 100px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-mute);
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.toggle-btn.active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* ─── MODAL ─── */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,20,25,0.5);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal-bg.show { display: flex; animation: fadeIn 0.2s; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--bg);
+  width: 100%;
+  max-width: 480px;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.modal-close {
+  background: var(--surface-elev);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+}
+
+/* ─── TRANSACTIONS ─── */
+.txn-day {
+  margin-bottom: 18px;
+}
+
+.txn-day-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.txn-day-total {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ink-mute);
+  font-weight: 600;
+}
+
+.txn-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.txn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.txn-body { flex: 1; min-width: 0; }
+.txn-cat {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 1px;
+}
+.txn-note {
+  font-size: 12px;
+  color: var(--ink-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.txn-amount {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--red);
+}
+.txn-amount.income { color: var(--green); }
+
+.txn-del {
+  background: none;
+  border: none;
+  color: var(--ink-mute);
+  font-size: 18px;
+  padding: 4px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+/* ─── DEBT/SAVINGS ITEMS ─── */
+.list-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+
+.list-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.list-item-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.list-item-meta {
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+
+.list-item-amount {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  text-align: right;
+}
+
+.list-item-amount.debt-out { color: var(--red); }
+.list-item-amount.debt-in { color: var(--green); }
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tag-fix { background: var(--blue-soft); color: var(--blue); }
+.tag-flex { background: var(--gold-soft); color: var(--gold); }
+.tag-paid { background: var(--green-soft); color: var(--green); }
+.tag-pending { background: var(--gold-soft); color: var(--gold); }
+.tag-overdue { background: var(--red-soft); color: var(--red); }
+
+.action-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.action-btn {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.action-btn.danger { color: var(--red); }
+.action-btn.primary { color: var(--accent); border-color: var(--accent-soft); background: var(--accent-soft); }
+
+/* ─── ALLOCATION PIE ─── */
+.alloc-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.alloc-card {
+  padding: 14px 12px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+.alloc-card.fix { background: var(--blue-soft); }
+.alloc-card.flex { background: var(--gold-soft); }
+.alloc-card.save { background: var(--green-soft); }
+
+.alloc-pct {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.alloc-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+.alloc-amt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* ─── EMPTY STATE ─── */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ink-mute);
+}
+
+.empty-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  opacity: 0.4;
+}
+
+.empty-text {
+  font-size: 13px;
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+/* ─── SETTINGS / DATA ─── */
+.data-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 20px 0;
+}
+
+.tip {
+  background: var(--accent-soft);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.tip strong { color: var(--accent); }
+
+/* Quick category chips */
+.cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.cat-chip {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.cat-chip.active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.summary-tile {
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.summary-tile.full { grid-column: span 2; }
+
+.summary-tile h4 {
+  font-size: 11px;
+  color: var(--ink-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.summary-tile .big {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.cat-breakdown {
+  margin-top: 4px;
+}
+
+.cat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 13px;
+}
+
+.cat-row:last-child { border-bottom: none; }
+.cat-row-name { color: var(--ink-soft); font-weight: 500; }
+.cat-row-amt { font-family: var(--font-mono); font-weight: 600; }
+
+.flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-suffix {
+  position: relative;
+}
+
+.input-suffix .suffix {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-mute);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  pointer-events: none;
+}
+
+.save-allocate-row {
+  background: var(--green-soft);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.save-allocate-row .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.save-allocate-row .label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--green);
+}
+
+.save-allocate-row .amt {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--green);
+}
+
+.save-allocate-row .hint {
+  font-size: 11px;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ LOGIN SCREEN ══════════════════ -->
+<div id="loginScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;overflow-y:auto;padding:40px 20px;">
+  <div style="max-width:380px;margin:40px auto;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="font-family:var(--font-display);font-style:italic;font-weight:600;font-size:42px;letter-spacing:-0.02em;">MoneyOS<span style="display:inline-block;width:12px;height:12px;background:var(--accent);border-radius:50%;margin-left:6px;vertical-align:middle;"></span></div>
+      <div style="font-size:14px;color:var(--ink-mute);margin-top:8px;">Đăng nhập để đồng bộ trên mọi thiết bị</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;gap:6px;background:var(--surface-elev);padding:4px;border-radius:100px;margin-bottom:18px;">
+        <button class="toggle-btn active" data-auth="signin" onclick="switchAuthMode('signin')">Đăng nhập</button>
+        <button class="toggle-btn" data-auth="signup" onclick="switchAuthMode('signup')">Đăng ký</button>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email</label>
+        <input type="email" id="loginEmail" placeholder="email@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label class="field-label">Mật khẩu</label>
+        <input type="password" id="loginPassword" placeholder="Tối thiểu 6 ký tự" autocomplete="current-password">
+      </div>
+
+      <button class="btn btn-full" id="authSubmitBtn" onclick="doAuth()">Đăng nhập</button>
+
+      <div id="authError" style="display:none;background:var(--red-soft);color:var(--red);padding:10px 12px;border-radius:var(--radius-sm);font-size:13px;margin-top:12px;"></div>
+    </div>
+
+    <div class="tip" style="margin-top:14px;">
+      <strong>An toàn:</strong> Dữ liệu mã hóa khi truyền &amp; lưu trên Supabase. Chỉ bạn truy cập được dữ liệu của mình.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<div id="appRoot" style="display:none;">
+
+<!-- ══════════════════ HEADER ══════════════════ -->
+<header class="header">
+  <div class="header-top">
+    <div class="brand">MoneyOS<span class="brand-dot"></span></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="syncIndicator" style="font-size:11px;color:var(--ink-mute);font-family:var(--font-mono);display:flex;align-items:center;gap:4px;"></span>
+      <div class="month-pill">
+        <select id="monthSelect"></select>
+      </div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--ink-mute);" id="headerSubtitle">Harry's personal finance</div>
+</header>
+
+<!-- ══════════════════ DASHBOARD ══════════════════ -->
+<section class="view active" id="view-dashboard">
+
+  <div class="hero">
+    <div class="hero-label">Còn lại tháng này</div>
+    <div class="hero-amount" id="heroRemaining">0<span class="unit">đ</span></div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-label">Lương</div>
+        <div class="hero-stat-value" id="heroSalary">0đ</div>
+      </div>
+      <div>
+        <div class="hero-stat-label">Đã chi</div>
+        <div class="hero-stat-value" id="heroSpent">0đ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Burn rate / Forecast -->
+  <div class="card" id="burnCard" style="display:none;">
+    <div class="flex-row" style="margin-bottom:8px;">
+      <span style="font-family:var(--font-display);font-style:italic;font-size:14px;color:var(--ink-soft);">Tốc độ chi tiêu</span>
+      <span class="tag" id="burnTag">—</span>
+    </div>
+    <div style="font-family:var(--font-display);font-weight:500;font-size:18px;letter-spacing:-0.01em;margin-bottom:4px;" id="burnText">—</div>
+    <div style="font-size:12px;color:var(--ink-mute);font-family:var(--font-mono);" id="burnSub">—</div>
+  </div>
+
+  <!-- Net worth tile -->
+  <div class="kpi-row">
+    <div class="kpi" id="kpiNet" style="grid-column:span 2;">
+      <div class="kpi-label">Net worth tháng</div>
+      <div class="kpi-value" id="kpiNetValue">0đ</div>
+      <div class="kpi-sub" id="kpiNetBreakdown">— = tiết kiệm + người nợ − tôi nợ</div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" id="kpiFixed">
+      <div class="kpi-label">Cố định</div>
+      <div class="kpi-value">0đ</div>
+      <div class="kpi-sub">0 / 0</div>
+    </div>
+    <div class="kpi" id="kpiFlex">
+      <div class="kpi-label">Linh hoạt</div>
+      <div class="kpi-value">0đ</div>
+      <div class="kpi-sub">0 / 0</div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" id="kpiDebtOut">
+      <div class="kpi-label">Tôi đang nợ</div>
+      <div class="kpi-value">0đ</div>
+      <div class="kpi-sub">— khoản chưa trả</div>
+    </div>
+    <div class="kpi" id="kpiDebtIn">
+      <div class="kpi-label">Người nợ tôi</div>
+      <div class="kpi-value">0đ</div>
+      <div class="kpi-sub">— khoản chưa thu</div>
+    </div>
+  </div>
+
+  <!-- Daily spending chart -->
+  <div class="card" id="dailyChartCard" style="display:none;">
+    <div style="font-family:var(--font-display);font-style:italic;font-size:14px;color:var(--ink-soft);margin-bottom:12px;">Chi tiêu theo ngày</div>
+    <div id="dailyChart" style="position:relative;"></div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink-mute);font-family:var(--font-mono);margin-top:6px;" id="dailyChartLabels"></div>
+  </div>
+
+  <!-- MoM comparison -->
+  <div class="card" id="momCard" style="display:none;">
+    <div style="font-family:var(--font-display);font-style:italic;font-size:14px;color:var(--ink-soft);margin-bottom:12px;">So với tháng trước</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div>
+        <div style="font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Tháng trước</div>
+        <div style="font-family:var(--font-display);font-weight:500;font-size:18px;" id="momPrev">0đ</div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Tháng này</div>
+        <div style="font-family:var(--font-display);font-weight:500;font-size:18px;" id="momCurr">0đ</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line-soft);font-size:13px;" id="momDelta">—</div>
+  </div>
+
+  <!-- Top categories -->
+  <div class="section-label">Top chi nhiều nhất <span class="count" id="topCount">0</span></div>
+  <div id="topCatList"></div>
+
+  <!-- Savings overview -->
+  <div class="section-label" style="margin-top:20px;">Tổng quan tiết kiệm</div>
+  <div class="card" id="savingsOverview">
+    <div class="flex-row" style="margin-bottom:10px;">
+      <span style="font-family:var(--font-display);font-weight:500;font-size:20px;letter-spacing:-0.01em;" id="savingsTotal">0đ</span>
+      <span style="font-size:12px;color:var(--ink-mute);font-family:var(--font-mono);" id="savingsTargetRatio">— / —</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="savingsProgress" style="width:0%"></div></div>
+    <div class="progress-meta" id="savingsMeta">Chưa có hũ tiết kiệm nào</div>
+  </div>
+
+  <!-- Debts due soon -->
+  <div class="section-label" style="margin-top:20px;">Nợ sắp đến hạn (7 ngày) <span class="count" id="dueCount">0</span></div>
+  <div id="dueList"></div>
+
+  <!-- Budget alerts -->
+  <div class="section-label" style="margin-top:20px;">Ngân sách cần chú ý <span class="count" id="alertCount">0</span></div>
+  <div id="alertList"></div>
+
+  <!-- Recent transactions -->
+  <div class="section-label" style="margin-top:20px;">Giao dịch gần đây</div>
+  <div id="recentTxn"></div>
+</section>
+
+<!-- ══════════════════ ALLOCATION ══════════════════ -->
+<section class="view" id="view-allocate">
+  <div class="section-label">Lương tháng này</div>
+
+  <div class="card">
+    <div class="field" style="margin-bottom:0;">
+      <label class="field-label">Tổng lương (VND)</label>
+      <div class="input-suffix">
+        <input type="text" id="salaryInput" inputmode="numeric" placeholder="vd: 30.000.000">
+        <span class="suffix">đ</span>
+      </div>
+    </div>
+    <button class="btn btn-full" style="margin-top:14px;" onclick="saveSalary()">Lưu lương</button>
+  </div>
+
+  <div class="tip">
+    <strong>Cách tính:</strong> Cố định &amp; Linh hoạt tự lấy tổng <em>hạn mức</em> từ các danh mục trong tab Budget. Tiết kiệm = Lương − (Cố định + Linh hoạt).
+  </div>
+
+  <div class="alloc-summary" id="allocSummary">
+    <div class="alloc-card fix">
+      <div class="alloc-pct" id="sumFixPct">0%</div>
+      <div class="alloc-label">Cố định</div>
+      <div class="alloc-amt" id="sumFixAmt">0đ</div>
+    </div>
+    <div class="alloc-card flex">
+      <div class="alloc-pct" id="sumFlexPct">0%</div>
+      <div class="alloc-label">Linh hoạt</div>
+      <div class="alloc-amt" id="sumFlexAmt">0đ</div>
+    </div>
+    <div class="alloc-card save">
+      <div class="alloc-pct" id="sumSavePct">0%</div>
+      <div class="alloc-label">Tiết kiệm</div>
+      <div class="alloc-amt" id="sumSaveAmt">0đ</div>
+    </div>
+  </div>
+
+  <div id="allocWarning" style="display:none;background:var(--red-soft);color:var(--red);padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;">
+    ⚠️ <strong>Thâm hụt:</strong> Tổng Cố định + Linh hoạt đang <span id="deficitAmt">0đ</span> vượt quá lương. Hãy giảm limit ở Budget hoặc tăng lương.
+  </div>
+
+  <div class="card" style="background:var(--surface-elev);">
+    <div class="flex-row" style="margin-bottom:10px;">
+      <div style="font-family:var(--font-display);font-weight:600;font-size:16px;">Chi tiết hạn mức</div>
+      <button class="btn-ghost" onclick="switchView('budget')">→ Sửa ở Budget</button>
+    </div>
+    <div id="allocBreakdown" style="font-size:13px;"></div>
+  </div>
+</section>
+
+<!-- ══════════════════ BUDGET ══════════════════ -->
+<section class="view" id="view-budget">
+  <div class="flex-row" style="margin-bottom:14px;">
+    <div class="section-label" style="margin:0;">Danh mục ngân sách</div>
+    <button class="btn btn-sm" onclick="openCatModal()">+ Thêm</button>
+  </div>
+
+  <div class="section-label" style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--blue);">Chi phí cố định</div>
+  <div id="budgetFixList"></div>
+
+  <div class="section-label" style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-top:18px;">Chi phí linh hoạt</div>
+  <div id="budgetFlexList"></div>
+</section>
+
+<!-- ══════════════════ TRANSACTIONS ══════════════════ -->
+<section class="view" id="view-txn">
+  <div class="flex-row" style="margin-bottom:14px;">
+    <div class="section-label" style="margin:0;">Giao dịch tháng này</div>
+    <button class="btn btn-sm" onclick="openTxnModal()">+ Mới</button>
+  </div>
+  <div id="txnList"></div>
+</section>
+
+<!-- ══════════════════ DEBT ══════════════════ -->
+<section class="view" id="view-debt">
+  <div class="flex-row" style="margin-bottom:14px;">
+    <div class="section-label" style="margin:0;">Sổ nợ</div>
+    <button class="btn btn-sm" onclick="openDebtModal()">+ Thêm</button>
+  </div>
+
+  <div class="section-label" style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);">Tôi đang nợ</div>
+  <div id="debtOutList"></div>
+
+  <div class="section-label" style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-top:18px;">Người nợ tôi</div>
+  <div id="debtInList"></div>
+</section>
+
+<!-- ══════════════════ SAVINGS ══════════════════ -->
+<section class="view" id="view-save">
+  <div class="save-allocate-row" id="saveAllocateBanner" style="display:none;">
+    <div class="head">
+      <span class="label">Tiết kiệm tháng này</span>
+      <span class="amt" id="saveLeftAmt">0đ</span>
+    </div>
+    <div class="hint">Phân bổ vào các hũ bên dưới bằng nút "+ Nạp" của mỗi hũ</div>
+  </div>
+
+  <div class="flex-row" style="margin-bottom:14px;">
+    <div class="section-label" style="margin:0;">Các hũ tiết kiệm</div>
+    <button class="btn btn-sm" onclick="openSaveModal()">+ Tạo hũ</button>
+  </div>
+
+  <div id="savingList"></div>
+
+  <div class="divider"></div>
+  <button class="btn btn-secondary btn-full" onclick="switchView('settings')">⚙️ Cài đặt & Backup dữ liệu</button>
+</section>
+
+<!-- ══════════════════ SETTINGS (hidden tab, accessed via savings) ══════════════════ -->
+<section class="view" id="view-settings">
+  <div class="section-label">Cài đặt</div>
+
+  <div class="card">
+    <h3 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin-bottom:10px;">Tài khoản</h3>
+    <div style="font-size:13px;color:var(--ink-soft);margin-bottom:6px;">Đang đăng nhập với</div>
+    <div style="font-family:var(--font-mono);font-size:14px;font-weight:600;margin-bottom:14px;" id="accountEmail">—</div>
+    <div style="font-size:12px;color:var(--ink-mute);margin-bottom:14px;font-family:var(--font-mono);" id="lastSyncedText">—</div>
+    <button class="btn btn-secondary" onclick="doLogout()">Đăng xuất</button>
+  </div>
+
+  <div class="card">
+    <h3 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin-bottom:10px;">Sao lưu dữ liệu</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;">
+      Dữ liệu tự động sync lên Supabase mỗi lần thay đổi. Export JSON nếu muốn backup thêm 1 lớp.
+    </p>
+    <div class="data-actions">
+      <button class="btn btn-secondary" onclick="exportData()">⬇️ Export JSON</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">⬆️ Import</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-family:var(--font-display);font-weight:600;font-size:18px;margin-bottom:10px;">Reset dữ liệu</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin-bottom:14px;">
+      Xóa toàn bộ dữ liệu và bắt đầu lại từ đầu. Không thể hoàn tác.
+    </p>
+    <button class="btn btn-secondary" style="color:var(--red);border-color:var(--red-soft);" onclick="resetAll()">🗑️ Xóa hết</button>
+  </div>
+
+  <div class="card" style="background:var(--surface-elev);">
+    <p style="font-size:12px;color:var(--ink-mute);text-align:center;font-family:var(--font-display);font-style:italic;">
+      MoneyOS · built for Harry · v2.0 cloud sync
+    </p>
+  </div>
+
+  <button class="btn btn-ghost btn-full" onclick="switchView('save')">← Quay lại Tiết kiệm</button>
+</section>
+
+<!-- ══════════════════ BOTTOM NAV ══════════════════ -->
+<nav class="bottom-nav">
+  <button class="tab-btn active" data-view="dashboard">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    <span>Tổng</span>
+  </button>
+  <button class="tab-btn" data-view="allocate">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+    <span>Lương</span>
+  </button>
+  <button class="tab-btn" data-view="budget">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    <span>Budget</span>
+  </button>
+  <button class="tab-btn" data-view="txn">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <span>Giao dịch</span>
+  </button>
+  <button class="tab-btn" data-view="debt">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+    <span>Nợ</span>
+  </button>
+  <button class="tab-btn" data-view="save">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+    <span>Tiết kiệm</span>
+  </button>
+</nav>
+
+<!-- ══════════════════ FAB ══════════════════ -->
+<button class="fab" onclick="openTxnModal()" id="fab">+</button>
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+</div>
+<!-- ══════════════════ END APP ══════════════════ -->
+
+<script>
+/* ════════════════════════════════════════════
+   MoneyOS — Personal finance dashboard
+   Cloud sync: Supabase
+   ════════════════════════════════════════════ */
+
+// ─── SUPABASE CONFIG ───
+const SUPABASE_URL = 'https://llvvwdrbbohsvqwkrawl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsdnZ3ZHJiYm9oc3Zxd2tyYXdsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MTk2MjcsImV4cCI6MjA5NTA5NTYyN30.zPuLghzCCOtSBAy-LN4ZjmbIBIWt6R9oQgm2XApMbnQ';
+
+// Auth state
+let session = null; // { access_token, refresh_token, user: {id, email} }
+let syncStatus = 'idle'; // 'idle' | 'syncing' | 'synced' | 'error' | 'offline'
+let syncTimer = null;
+let lastSyncedAt = null;
+
+// ─── STATE ───
+const DB_KEY = 'moneyos_v1';
+let state = {
+  currentMonth: getCurrentMonthKey(),
+  months: {},
+  categories: [
+    { id: 'rent', name: 'Tiền nhà', type: 'fix', icon: '🏠', limit: 0 },
+    { id: 'util', name: 'Điện nước internet', type: 'fix', icon: '💡', limit: 0 },
+    { id: 'food', name: 'Ăn uống', type: 'flex', icon: '🍜', limit: 0 },
+    { id: 'transport', name: 'Đi lại', type: 'flex', icon: '🚗', limit: 0 },
+    { id: 'fun', name: 'Giải trí', type: 'flex', icon: '🎮', limit: 0 },
+    { id: 'shop', name: 'Mua sắm', type: 'flex', icon: '🛍️', limit: 0 },
+  ],
+  debts: [],   // {id, type:'out'|'in', who, amount, dueDate, note, paid}
+  savings: [], // {id, name, target, current, icon, history:[{date,amount}]}
+};
+
+function getCurrentMonthKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+function initMonth(mk) {
+  if (!state.months[mk]) {
+    state.months[mk] = {
+      salary: 0,
+      transactions: [], // {id, date, catId, amount, note}
+      saveAllocated: 0, // tổng đã đẩy vào các hũ tháng này
+    };
+  }
+  return state.months[mk];
+}
+
+function save() {
+  localStorage.setItem(DB_KEY, JSON.stringify(state));
+  // Debounced cloud sync
+  if (session) {
+    if (syncTimer) clearTimeout(syncTimer);
+    setSyncStatus('syncing');
+    syncTimer = setTimeout(() => syncToCloud(), 1500);
+  }
+}
+
+function load() {
+  const raw = localStorage.getItem(DB_KEY);
+  if (raw) {
+    try { state = JSON.parse(raw); } catch(e) { console.error(e); }
+  }
+  initMonth(state.currentMonth);
+}
+
+// ─── SUPABASE API ───
+async function sbFetch(path, options = {}) {
+  const url = SUPABASE_URL + path;
+  const headers = {
+    'apikey': SUPABASE_ANON_KEY,
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+  if (session && session.access_token) {
+    headers['Authorization'] = 'Bearer ' + session.access_token;
+  }
+  const res = await fetch(url, { ...options, headers });
+  const text = await res.text();
+  let body = null;
+  try { body = text ? JSON.parse(text) : null; } catch(e) { body = text; }
+  if (!res.ok) {
+    const msg = (body && body.error_description) || (body && body.msg) || (body && body.message) || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return body;
+}
+
+// ─── AUTH ───
+let authMode = 'signin';
+function switchAuthMode(mode) {
+  authMode = mode;
+  document.querySelectorAll('[data-auth]').forEach(b => {
+    b.classList.toggle('active', b.dataset.auth === mode);
+  });
+  document.getElementById('authSubmitBtn').textContent = mode === 'signin' ? 'Đăng nhập' : 'Đăng ký';
+  document.getElementById('loginPassword').setAttribute('autocomplete', mode === 'signin' ? 'current-password' : 'new-password');
+  hideAuthError();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideAuthError() {
+  document.getElementById('authError').style.display = 'none';
+}
+
+async function doAuth() {
+  hideAuthError();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) return showAuthError('Nhập email và mật khẩu');
+  if (password.length < 6) return showAuthError('Mật khẩu tối thiểu 6 ký tự');
+
+  const btn = document.getElementById('authSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const endpoint = authMode === 'signin' ? '/auth/v1/token?grant_type=password' : '/auth/v1/signup';
+    const result = await sbFetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+
+    // signup may return user without session if email confirmation required
+    if (result.access_token) {
+      session = {
+        access_token: result.access_token,
+        refresh_token: result.refresh_token,
+        user: result.user
+      };
+    } else if (result.session) {
+      session = {
+        access_token: result.session.access_token,
+        refresh_token: result.session.refresh_token,
+        user: result.user
+      };
+    } else if (result.user && authMode === 'signup') {
+      // Need to sign in after signup
+      const signInResult = await sbFetch('/auth/v1/token?grant_type=password', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+      });
+      session = {
+        access_token: signInResult.access_token,
+        refresh_token: signInResult.refresh_token,
+        user: signInResult.user
+      };
+    }
+
+    if (!session) {
+      return showAuthError('Đăng nhập không thành công. Kiểm tra lại email/password.');
+    }
+
+    localStorage.setItem('moneyos_session', JSON.stringify(session));
+    await enterApp();
+  } catch(e) {
+    console.error(e);
+    let msg = e.message;
+    if (msg.includes('Invalid login')) msg = 'Email hoặc mật khẩu sai';
+    else if (msg.includes('already registered')) msg = 'Email đã đăng ký. Chuyển qua Đăng nhập.';
+    else if (msg.includes('weak password') || msg.includes('Password')) msg = 'Mật khẩu yếu — thử dài hơn';
+    showAuthError(msg);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'signin' ? 'Đăng nhập' : 'Đăng ký';
+  }
+}
+
+async function doLogout() {
+  if (!confirm('Đăng xuất? Dữ liệu vẫn an toàn trên cloud, đăng nhập lại để truy cập.')) return;
+  try {
+    await sbFetch('/auth/v1/logout', { method: 'POST' });
+  } catch(e) { /* ignore */ }
+  session = null;
+  localStorage.removeItem('moneyos_session');
+  localStorage.removeItem(DB_KEY);
+  location.reload();
+}
+
+// ─── CLOUD SYNC ───
+function setSyncStatus(status) {
+  syncStatus = status;
+  const el = document.getElementById('syncIndicator');
+  if (!el) return;
+  const map = {
+    idle: '',
+    syncing: '<span style="color:var(--gold);">⟳ Đang sync</span>',
+    synced: '<span style="color:var(--green);">✓ Đã sync</span>',
+    error: '<span style="color:var(--red);">⚠️ Lỗi sync</span>',
+    offline: '<span style="color:var(--ink-mute);">⚪ Offline</span>',
+  };
+  el.innerHTML = map[status] || '';
+}
+
+async function syncToCloud() {
+  if (!session) return;
+  if (!navigator.onLine) {
+    setSyncStatus('offline');
+    return;
+  }
+  setSyncStatus('syncing');
+  try {
+    await sbFetch('/rest/v1/moneyos_data', {
+      method: 'POST',
+      headers: {
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify({
+        user_id: session.user.id,
+        data: state,
+        updated_at: new Date().toISOString()
+      })
+    });
+    lastSyncedAt = new Date();
+    setSyncStatus('synced');
+    updateLastSyncedText();
+  } catch(e) {
+    console.error('Sync failed:', e);
+    setSyncStatus('error');
+  }
+}
+
+async function loadFromCloud() {
+  if (!session) return false;
+  setSyncStatus('syncing');
+  try {
+    const result = await sbFetch(`/rest/v1/moneyos_data?user_id=eq.${session.user.id}&select=data,updated_at`, {
+      method: 'GET'
+    });
+    if (Array.isArray(result) && result.length > 0 && result[0].data) {
+      state = result[0].data;
+      localStorage.setItem(DB_KEY, JSON.stringify(state));
+      lastSyncedAt = new Date(result[0].updated_at);
+      setSyncStatus('synced');
+      updateLastSyncedText();
+      return true;
+    }
+    // No cloud data yet, initial sync
+    setSyncStatus('synced');
+    return false;
+  } catch(e) {
+    console.error('Load failed:', e);
+    setSyncStatus('error');
+    return false;
+  }
+}
+
+function updateLastSyncedText() {
+  const el = document.getElementById('lastSyncedText');
+  if (!el || !lastSyncedAt) return;
+  el.textContent = 'Sync lần cuối: ' + lastSyncedAt.toLocaleString('vi-VN');
+}
+
+window.addEventListener('online', () => {
+  if (session) syncToCloud();
+});
+window.addEventListener('offline', () => {
+  setSyncStatus('offline');
+});
+
+// ─── APP BOOTSTRAP ───
+async function enterApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appRoot').style.display = 'block';
+
+  // Show email in header subtitle
+  if (session && session.user) {
+    document.getElementById('headerSubtitle').textContent = session.user.email;
+    document.getElementById('accountEmail').textContent = session.user.email;
+  }
+
+  // Try to load from cloud first
+  await loadFromCloud();
+  initMonth(state.currentMonth);
+  buildMonthOptions();
+  render();
+}
+
+async function bootstrap() {
+  // Try restore session
+  const rawSession = localStorage.getItem('moneyos_session');
+  if (rawSession) {
+    try {
+      session = JSON.parse(rawSession);
+      // Quick session validity check
+      await sbFetch('/auth/v1/user', { method: 'GET' });
+      await enterApp();
+      return;
+    } catch(e) {
+      // Try refresh token
+      try {
+        const refreshed = await sbFetch('/auth/v1/token?grant_type=refresh_token', {
+          method: 'POST',
+          body: JSON.stringify({ refresh_token: session.refresh_token })
+        });
+        session = {
+          access_token: refreshed.access_token,
+          refresh_token: refreshed.refresh_token,
+          user: refreshed.user
+        };
+        localStorage.setItem('moneyos_session', JSON.stringify(session));
+        await enterApp();
+        return;
+      } catch(e2) {
+        session = null;
+        localStorage.removeItem('moneyos_session');
+      }
+    }
+  }
+  // No valid session, show login
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('appRoot').style.display = 'none';
+}
+
+// ─── FORMATTERS ───
+function fmt(n) {
+  if (!n && n !== 0) return '0';
+  return new Intl.NumberFormat('vi-VN').format(Math.round(n));
+}
+function fmtVND(n) { return fmt(n) + 'đ'; }
+function parseNum(s) {
+  if (!s) return 0;
+  const cleaned = String(s).replace(/[^\d]/g, '');
+  return parseInt(cleaned) || 0;
+}
+function fmtDate(d) {
+  const date = new Date(d);
+  return `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}`;
+}
+function fmtDateFull(d) {
+  const date = new Date(d);
+  const days = ['CN','T2','T3','T4','T5','T6','T7'];
+  return `${days[date.getDay()]}, ${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()}`;
+}
+
+// ─── NAVIGATION ───
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-view="${name}"]`);
+  if (btn) btn.classList.add('active');
+  document.getElementById('fab').style.display = (name === 'settings') ? 'none' : 'flex';
+  window.scrollTo(0, 0);
+  render();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchView(btn.dataset.view));
+});
+
+// ─── MONTH SELECT ───
+function buildMonthOptions() {
+  const select = document.getElementById('monthSelect');
+  const now = new Date();
+  const months = [];
+  for (let i = -2; i <= 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    months.push({ key, label: `Tháng ${d.getMonth()+1}/${d.getFullYear()}` });
+  }
+  // ensure current month is included
+  if (!months.find(m => m.key === state.currentMonth)) {
+    months.unshift({ key: state.currentMonth, label: state.currentMonth });
+  }
+  select.innerHTML = months.map(m =>
+    `<option value="${m.key}" ${m.key === state.currentMonth ? 'selected' : ''}>${m.label}</option>`
+  ).join('');
+  select.onchange = () => {
+    state.currentMonth = select.value;
+    initMonth(state.currentMonth);
+    save();
+    render();
+  };
+}
+
+// ─── COMPUTATIONS ───
+function getMonth() { return state.months[state.currentMonth] || initMonth(state.currentMonth); }
+
+function getCategorySpent(catId) {
+  const m = getMonth();
+  return m.transactions.filter(t => t.catId === catId).reduce((s, t) => s + t.amount, 0);
+}
+
+function getTotalSpent() {
+  const m = getMonth();
+  return m.transactions.reduce((s, t) => s + t.amount, 0);
+}
+
+function getSpentByType(type) {
+  const m = getMonth();
+  const ids = state.categories.filter(c => c.type === type).map(c => c.id);
+  return m.transactions.filter(t => ids.includes(t.catId)).reduce((s, t) => s + t.amount, 0);
+}
+
+function getTotalLimit(type) {
+  return state.categories.filter(c => c.type === type).reduce((s, c) => s + (c.limit || 0), 0);
+}
+
+function getAllocAmounts() {
+  const m = getMonth();
+  const fix = getTotalLimit('fix');
+  const flex = getTotalLimit('flex');
+  const save = Math.max(0, m.salary - fix - flex);
+  return { fix, flex, save };
+}
+
+function getSaveRemaining() {
+  const m = getMonth();
+  const alloc = getAllocAmounts();
+  return Math.max(0, alloc.save - (m.saveAllocated || 0));
+}
+
+// ─── RENDER ───
+function render() {
+  renderDashboard();
+  renderAllocate();
+  renderBudget();
+  renderTxn();
+  renderDebt();
+  renderSavings();
+}
+
+function renderDashboard() {
+  const m = getMonth();
+  const spent = getTotalSpent();
+  const remaining = m.salary - spent;
+
+  document.getElementById('heroRemaining').innerHTML = fmt(remaining) + '<span class="unit">đ</span>';
+  document.getElementById('heroSalary').textContent = fmtVND(m.salary);
+  document.getElementById('heroSpent').textContent = fmtVND(spent);
+
+  // ─── Burn rate / Forecast ───
+  renderBurnRate(m, spent);
+
+  // ─── Net worth ───
+  renderNetWorth();
+
+  // ─── KPIs ───
+  const fixSpent = getSpentByType('fix');
+  const fixLim = getTotalLimit('fix');
+  const flexSpent = getSpentByType('flex');
+  const flexLim = getTotalLimit('flex');
+
+  document.querySelector('#kpiFixed .kpi-value').textContent = fmtVND(fixSpent);
+  document.querySelector('#kpiFixed .kpi-sub').textContent = fmtVND(fixSpent) + ' / ' + fmtVND(fixLim);
+  document.getElementById('kpiFixed').className = 'kpi' + (fixLim && fixSpent > fixLim ? ' warn' : '');
+
+  document.querySelector('#kpiFlex .kpi-value').textContent = fmtVND(flexSpent);
+  document.querySelector('#kpiFlex .kpi-sub').textContent = fmtVND(flexSpent) + ' / ' + fmtVND(flexLim);
+  document.getElementById('kpiFlex').className = 'kpi' + (flexLim && flexSpent > flexLim ? ' warn' : '');
+
+  // Debt KPIs
+  const debtOut = state.debts.filter(d => d.type === 'out' && !d.paid).reduce((s,d) => s+d.amount, 0);
+  const debtIn = state.debts.filter(d => d.type === 'in' && !d.paid).reduce((s,d) => s+d.amount, 0);
+  const debtOutCount = state.debts.filter(d => d.type === 'out' && !d.paid).length;
+  const debtInCount = state.debts.filter(d => d.type === 'in' && !d.paid).length;
+
+  document.querySelector('#kpiDebtOut .kpi-value').textContent = fmtVND(debtOut);
+  document.querySelector('#kpiDebtOut .kpi-sub').textContent = debtOutCount + ' khoản chưa trả';
+  document.querySelector('#kpiDebtIn .kpi-value').textContent = fmtVND(debtIn);
+  document.querySelector('#kpiDebtIn .kpi-sub').textContent = debtInCount + ' khoản chưa thu';
+
+  // ─── Daily spending chart ───
+  renderDailyChart(m);
+
+  // ─── MoM comparison ───
+  renderMoM(m, spent);
+
+  // ─── Top categories ───
+  renderTopCategories(m);
+
+  // ─── Savings overview ───
+  renderSavingsOverview();
+
+  // ─── Debts due soon ───
+  renderDueDebts();
+
+  // ─── Budget alerts ───
+  const alerts = state.categories
+    .filter(c => c.limit > 0)
+    .map(c => ({ ...c, spent: getCategorySpent(c.id) }))
+    .filter(c => c.spent / c.limit > 0.8)
+    .sort((a, b) => (b.spent/b.limit) - (a.spent/a.limit));
+
+  document.getElementById('alertCount').textContent = alerts.length;
+  const alertList = document.getElementById('alertList');
+  if (alerts.length === 0) {
+    alertList.innerHTML = '<div class="empty"><div class="empty-icon">✓</div><div class="empty-text">Mọi mục đều trong ngân sách</div></div>';
+  } else {
+    alertList.innerHTML = alerts.slice(0, 4).map(c => renderBudgetItem(c, true)).join('');
+  }
+
+  // Recent transactions
+  const recent = [...m.transactions].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 5);
+  const recentEl = document.getElementById('recentTxn');
+  if (recent.length === 0) {
+    recentEl.innerHTML = '<div class="empty"><div class="empty-icon">💸</div><div class="empty-text">Chưa có giao dịch nào</div></div>';
+  } else {
+    recentEl.innerHTML = recent.map(t => renderTxnItem(t)).join('');
+  }
+}
+
+// ─── Helper: days in month, day of month, etc ───
+function getMonthMeta(monthKey) {
+  const [y, mo] = monthKey.split('-').map(Number);
+  const daysInMonth = new Date(y, mo, 0).getDate();
+  const now = new Date();
+  const isCurrentMonth = (now.getFullYear() === y && now.getMonth() + 1 === mo);
+  const today = isCurrentMonth ? now.getDate() : daysInMonth;
+  return { y, mo, daysInMonth, isCurrentMonth, today };
+}
+
+// ─── Burn rate / Forecast ───
+function renderBurnRate(m, spent) {
+  const card = document.getElementById('burnCard');
+  if (!m.salary || spent === 0) {
+    card.style.display = 'none';
+    return;
+  }
+  const meta = getMonthMeta(state.currentMonth);
+  if (!meta.isCurrentMonth) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+
+  const dailyAvg = spent / meta.today;
+  const projected = dailyAvg * meta.daysInMonth;
+  const budget = getTotalLimit('fix') + getTotalLimit('flex');
+  const idealDaily = budget / meta.daysInMonth;
+  const pace = idealDaily > 0 ? (dailyAvg / idealDaily) : 1;
+  const tag = document.getElementById('burnTag');
+  const text = document.getElementById('burnText');
+  const sub = document.getElementById('burnSub');
+
+  if (pace > 1.1) {
+    tag.textContent = 'Nhanh';
+    tag.className = 'tag tag-overdue';
+    text.textContent = `Nhanh hơn ${Math.round((pace - 1) * 100)}% so với mức trung bình`;
+    text.style.color = 'var(--red)';
+  } else if (pace > 0.95) {
+    tag.textContent = 'Đúng nhịp';
+    tag.className = 'tag tag-pending';
+    text.textContent = `Đúng tốc độ trung bình tháng`;
+    text.style.color = 'var(--gold)';
+  } else {
+    tag.textContent = 'Tiết kiệm';
+    tag.className = 'tag tag-paid';
+    text.textContent = `Chậm hơn ${Math.round((1 - pace) * 100)}% — tốt`;
+    text.style.color = 'var(--green)';
+  }
+
+  const willOverBudget = projected > budget && budget > 0;
+  sub.innerHTML = `Dự kiến cuối tháng: <strong>${fmtVND(projected)}</strong>` +
+    (budget > 0 ? ` · Budget ${fmtVND(budget)}` : '') +
+    (willOverBudget ? ` · <span style="color:var(--red);">vượt ${fmtVND(projected - budget)}</span>` : '');
+}
+
+// ─── Net worth ───
+function renderNetWorth() {
+  const totalSave = state.savings.reduce((s, x) => s + x.current, 0);
+  const debtIn = state.debts.filter(d => d.type === 'in' && !d.paid).reduce((s, d) => s + d.amount, 0);
+  const debtOut = state.debts.filter(d => d.type === 'out' && !d.paid).reduce((s, d) => s + d.amount, 0);
+  const net = totalSave + debtIn - debtOut;
+  document.getElementById('kpiNetValue').textContent = fmtVND(net);
+  document.getElementById('kpiNetBreakdown').textContent =
+    `${fmtVND(totalSave)} tiết kiệm + ${fmtVND(debtIn)} thu − ${fmtVND(debtOut)} trả`;
+  const card = document.getElementById('kpiNet');
+  card.className = 'kpi' + (net < 0 ? ' warn' : (net > 0 ? ' good' : ''));
+}
+
+// ─── Daily spending chart (SVG bar chart) ───
+function renderDailyChart(m) {
+  const card = document.getElementById('dailyChartCard');
+  if (m.transactions.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+
+  const meta = getMonthMeta(state.currentMonth);
+  const byDay = new Array(meta.daysInMonth).fill(0);
+  m.transactions.forEach(t => {
+    const day = parseInt(t.date.split('-')[2]);
+    if (day >= 1 && day <= meta.daysInMonth) byDay[day - 1] += t.amount;
+  });
+
+  const max = Math.max(...byDay, 1);
+  const W = 100; // percentage-based
+  const H = 100;
+  const barW = W / meta.daysInMonth;
+  const todayIdx = meta.isCurrentMonth ? meta.today - 1 : -1;
+
+  let bars = '';
+  for (let i = 0; i < meta.daysInMonth; i++) {
+    const h = (byDay[i] / max) * H;
+    const isToday = i === todayIdx;
+    const isFuture = meta.isCurrentMonth && i > todayIdx;
+    const color = isToday ? 'var(--accent)' : isFuture ? 'var(--line)' : (byDay[i] > 0 ? 'var(--ink)' : 'var(--line-soft)');
+    bars += `<div title="Ngày ${i+1}: ${fmtVND(byDay[i])}" style="position:absolute;left:${i * barW}%;bottom:0;width:calc(${barW}% - 2px);height:${Math.max(h, 2)}%;background:${color};border-radius:2px 2px 0 0;"></div>`;
+  }
+
+  document.getElementById('dailyChart').innerHTML =
+    `<div style="position:relative;height:80px;display:flex;align-items:flex-end;">${bars}</div>`;
+  document.getElementById('dailyChartLabels').innerHTML =
+    `<span>1</span><span>${Math.ceil(meta.daysInMonth / 2)}</span><span>${meta.daysInMonth}</span>`;
+}
+
+// ─── MoM comparison ───
+function renderMoM(m, currSpent) {
+  const card = document.getElementById('momCard');
+  const [y, mo] = state.currentMonth.split('-').map(Number);
+  const prevDate = new Date(y, mo - 2, 1);
+  const prevKey = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+  const prevM = state.months[prevKey];
+  if (!prevM || prevM.transactions.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+  const prevSpent = prevM.transactions.reduce((s, t) => s + t.amount, 0);
+  document.getElementById('momPrev').textContent = fmtVND(prevSpent);
+  document.getElementById('momCurr').textContent = fmtVND(currSpent);
+
+  const delta = currSpent - prevSpent;
+  const pct = prevSpent > 0 ? (delta / prevSpent * 100) : 0;
+  const deltaEl = document.getElementById('momDelta');
+  if (Math.abs(pct) < 1) {
+    deltaEl.innerHTML = `<span style="color:var(--ink-soft);">Gần bằng tháng trước</span>`;
+  } else if (delta > 0) {
+    deltaEl.innerHTML = `<span style="color:var(--red);font-weight:600;">↑ Tăng ${fmtVND(delta)}</span> <span style="color:var(--ink-mute);font-family:var(--font-mono);font-size:12px;">(+${Math.round(pct)}%)</span>`;
+  } else {
+    deltaEl.innerHTML = `<span style="color:var(--green);font-weight:600;">↓ Giảm ${fmtVND(-delta)}</span> <span style="color:var(--ink-mute);font-family:var(--font-mono);font-size:12px;">(${Math.round(pct)}%)</span>`;
+  }
+}
+
+// ─── Top categories ───
+function renderTopCategories(m) {
+  const byCategory = {};
+  m.transactions.forEach(t => {
+    byCategory[t.catId] = (byCategory[t.catId] || 0) + t.amount;
+  });
+  const top = Object.entries(byCategory)
+    .map(([catId, amt]) => ({ cat: state.categories.find(c => c.id === catId), amount: amt }))
+    .filter(x => x.cat)
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 5);
+
+  document.getElementById('topCount').textContent = top.length;
+  const list = document.getElementById('topCatList');
+  if (top.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-text">Chưa có giao dịch nào tháng này</div></div>';
+    return;
+  }
+  const max = top[0].amount;
+  list.innerHTML = top.map((x, i) => {
+    const pct = (x.amount / max) * 100;
+    const pctBudget = x.cat.limit > 0 ? Math.round(x.amount / x.cat.limit * 100) : null;
+    return `<div class="card-flat">
+      <div class="progress-row">
+        <span class="progress-name"><span style="color:var(--ink-mute);font-family:var(--font-mono);font-size:11px;margin-right:6px;">${i+1}</span>${x.cat.icon} ${x.cat.name}</span>
+        <span class="progress-fig"><span class="pct">${fmtVND(x.amount)}</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:var(--accent);"></div></div>
+      ${pctBudget !== null ? `<div class="progress-meta">${pctBudget}% hạn mức (${fmtVND(x.cat.limit)})</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ─── Savings overview ───
+function renderSavingsOverview() {
+  const totalCurrent = state.savings.reduce((s, x) => s + x.current, 0);
+  const totalTarget = state.savings.reduce((s, x) => s + x.target, 0);
+  const pct = totalTarget > 0 ? (totalCurrent / totalTarget * 100) : 0;
+  document.getElementById('savingsTotal').textContent = fmtVND(totalCurrent);
+  document.getElementById('savingsTargetRatio').textContent =
+    totalTarget > 0 ? `${Math.round(pct)}% / mục tiêu ${fmtVND(totalTarget)}` : '';
+  document.getElementById('savingsProgress').style.width = Math.min(100, pct) + '%';
+  const meta = document.getElementById('savingsMeta');
+  if (state.savings.length === 0) {
+    meta.textContent = 'Chưa có hũ tiết kiệm nào';
+  } else {
+    meta.textContent = `${state.savings.length} hũ · còn thiếu ${fmtVND(Math.max(0, totalTarget - totalCurrent))}`;
+  }
+}
+
+// ─── Debts due soon ───
+function renderDueDebts() {
+  const today = new Date();
+  const week = new Date();
+  week.setDate(today.getDate() + 7);
+  const todayStr = today.toISOString().slice(0, 10);
+  const weekStr = week.toISOString().slice(0, 10);
+
+  const due = state.debts.filter(d => !d.paid && d.dueDate && d.dueDate <= weekStr)
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+
+  document.getElementById('dueCount').textContent = due.length;
+  const list = document.getElementById('dueList');
+  if (due.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">✓</div><div class="empty-text">Không có khoản nào sắp đến hạn</div></div>';
+    return;
+  }
+  list.innerHTML = due.map(d => {
+    const isOverdue = d.dueDate < todayStr;
+    const daysLeft = Math.ceil((new Date(d.dueDate) - today) / (1000 * 60 * 60 * 24));
+    let dueText;
+    if (isOverdue) dueText = `Quá hạn ${Math.abs(daysLeft)} ngày`;
+    else if (daysLeft === 0) dueText = 'Hôm nay';
+    else if (daysLeft === 1) dueText = 'Ngày mai';
+    else dueText = `Còn ${daysLeft} ngày`;
+    return `<div class="card-flat" style="display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">${d.type === 'out' ? '→ Trả' : '← Thu'}: ${d.who}</div>
+        <div style="font-size:12px;color:${isOverdue ? 'var(--red)' : 'var(--ink-mute)'};margin-top:2px;">${dueText} · ${fmtDate(d.dueDate)}</div>
+      </div>
+      <div style="font-family:var(--font-mono);font-weight:600;color:${d.type === 'out' ? 'var(--red)' : 'var(--green)'};">${d.type === 'out' ? '−' : '+'}${fmtVND(d.amount)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTxnItem(t, showDate = true) {
+  const cat = state.categories.find(c => c.id === t.catId) || { name: 'Khác', icon: '💰' };
+  return `<div class="txn-item">
+    <div class="txn-icon">${cat.icon}</div>
+    <div class="txn-body">
+      <div class="txn-cat">${cat.name}</div>
+      <div class="txn-note">${showDate ? fmtDate(t.date) + ' · ' : ''}${t.note || '—'}</div>
+    </div>
+    <div class="txn-amount">−${fmtVND(t.amount)}</div>
+    <button class="txn-del" onclick="deleteTxn('${t.id}')">×</button>
+  </div>`;
+}
+
+function renderBudgetItem(c, compact = false) {
+  const spent = getCategorySpent(c.id);
+  const pct = c.limit > 0 ? (spent / c.limit * 100) : 0;
+  const fillClass = pct > 100 ? 'over' : pct > 80 ? 'warn' : '';
+  return `<div class="card-flat">
+    <div class="progress-row">
+      <span class="progress-name">${c.icon} ${c.name}</span>
+      <span class="progress-fig"><span class="pct">${Math.round(pct)}%</span></span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${Math.min(100,pct)}%"></div></div>
+    <div class="progress-meta">${fmtVND(spent)} / ${fmtVND(c.limit)}${c.limit && spent > c.limit ? ' · vượt ' + fmtVND(spent-c.limit) : ''}</div>
+    ${!compact ? `<div class="action-row">
+      <button class="action-btn" onclick="editCat('${c.id}')">Sửa</button>
+      <button class="action-btn danger" onclick="deleteCat('${c.id}')">Xóa</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function renderAllocate() {
+  const m = getMonth();
+  document.getElementById('salaryInput').value = m.salary ? fmt(m.salary) : '';
+
+  const amt = getAllocAmounts();
+  const totalForPct = m.salary || 1;
+  document.getElementById('sumFixPct').textContent = m.salary ? Math.round(amt.fix / totalForPct * 100) + '%' : '—';
+  document.getElementById('sumFlexPct').textContent = m.salary ? Math.round(amt.flex / totalForPct * 100) + '%' : '—';
+  document.getElementById('sumSavePct').textContent = m.salary ? Math.round(amt.save / totalForPct * 100) + '%' : '—';
+  document.getElementById('sumFixAmt').textContent = fmtVND(amt.fix);
+  document.getElementById('sumFlexAmt').textContent = fmtVND(amt.flex);
+  document.getElementById('sumSaveAmt').textContent = fmtVND(amt.save);
+
+  // Warning if deficit
+  const deficit = (amt.fix + amt.flex) - m.salary;
+  const warn = document.getElementById('allocWarning');
+  if (m.salary > 0 && deficit > 0) {
+    warn.style.display = 'block';
+    document.getElementById('deficitAmt').textContent = fmtVND(deficit);
+  } else {
+    warn.style.display = 'none';
+  }
+
+  // Breakdown by category
+  const fixCats = state.categories.filter(c => c.type === 'fix');
+  const flexCats = state.categories.filter(c => c.type === 'flex');
+  const breakdown = document.getElementById('allocBreakdown');
+  let html = '';
+  if (fixCats.length) {
+    html += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue);font-weight:700;margin-bottom:6px;">Cố định</div>';
+    html += '<div class="cat-breakdown" style="margin-bottom:12px;">';
+    fixCats.forEach(c => {
+      html += `<div class="cat-row"><span class="cat-row-name">${c.icon} ${c.name}</span><span class="cat-row-amt">${fmtVND(c.limit || 0)}</span></div>`;
+    });
+    html += '</div>';
+  }
+  if (flexCats.length) {
+    html += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold);font-weight:700;margin-bottom:6px;">Linh hoạt</div>';
+    html += '<div class="cat-breakdown">';
+    flexCats.forEach(c => {
+      html += `<div class="cat-row"><span class="cat-row-name">${c.icon} ${c.name}</span><span class="cat-row-amt">${fmtVND(c.limit || 0)}</span></div>`;
+    });
+    html += '</div>';
+  }
+  if (!fixCats.length && !flexCats.length) {
+    html = '<div style="color:var(--ink-mute);font-size:13px;text-align:center;padding:12px;">Chưa có danh mục nào. Thêm ở tab Budget.</div>';
+  }
+  breakdown.innerHTML = html;
+}
+
+function renderBudget() {
+  const fix = state.categories.filter(c => c.type === 'fix');
+  const flex = state.categories.filter(c => c.type === 'flex');
+  document.getElementById('budgetFixList').innerHTML = fix.length
+    ? fix.map(c => renderBudgetItem(c)).join('')
+    : '<div class="empty"><div class="empty-text">Chưa có danh mục cố định</div></div>';
+  document.getElementById('budgetFlexList').innerHTML = flex.length
+    ? flex.map(c => renderBudgetItem(c)).join('')
+    : '<div class="empty"><div class="empty-text">Chưa có danh mục linh hoạt</div></div>';
+}
+
+function renderTxn() {
+  const m = getMonth();
+  const txns = [...m.transactions].sort((a,b) => b.date.localeCompare(a.date));
+  const list = document.getElementById('txnList');
+  if (txns.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">Chưa có giao dịch nào tháng này</div></div>';
+    return;
+  }
+  // Group by day
+  const byDay = {};
+  txns.forEach(t => {
+    if (!byDay[t.date]) byDay[t.date] = [];
+    byDay[t.date].push(t);
+  });
+  list.innerHTML = Object.keys(byDay).sort((a,b) => b.localeCompare(a)).map(date => {
+    const dayTotal = byDay[date].reduce((s,t) => s+t.amount, 0);
+    return `<div class="txn-day">
+      <div class="txn-day-label">
+        <span>${fmtDateFull(date)}</span>
+        <span class="txn-day-total">−${fmtVND(dayTotal)}</span>
+      </div>
+      ${byDay[date].map(t => renderTxnItem(t, false)).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderDebt() {
+  const out = state.debts.filter(d => d.type === 'out');
+  const inn = state.debts.filter(d => d.type === 'in');
+
+  const today = new Date().toISOString().slice(0,10);
+  function debtCard(d) {
+    let statusTag = '';
+    if (d.paid) statusTag = '<span class="tag tag-paid">Đã xong</span>';
+    else if (d.dueDate && d.dueDate < today) statusTag = '<span class="tag tag-overdue">Quá hạn</span>';
+    else statusTag = '<span class="tag tag-pending">Chưa xong</span>';
+    return `<div class="list-item" style="${d.paid ? 'opacity:0.6;' : ''}">
+      <div class="list-item-head">
+        <div>
+          <div class="list-item-title">${d.who}</div>
+          <div class="list-item-meta">${d.dueDate ? 'Hạn ' + fmtDateFull(d.dueDate) : 'Không hạn'} ${statusTag}</div>
+          ${d.note ? `<div class="list-item-meta" style="margin-top:4px;">${d.note}</div>` : ''}
+        </div>
+        <div class="list-item-amount ${d.type === 'out' ? 'debt-out' : 'debt-in'}">${d.type === 'out' ? '−' : '+'}${fmtVND(d.amount)}</div>
+      </div>
+      <div class="action-row">
+        <button class="action-btn ${!d.paid ? 'primary' : ''}" onclick="toggleDebtPaid('${d.id}')">${d.paid ? 'Mở lại' : (d.type === 'out' ? 'Đã trả' : 'Đã thu')}</button>
+        <button class="action-btn" onclick="editDebt('${d.id}')">Sửa</button>
+        <button class="action-btn danger" onclick="deleteDebt('${d.id}')">Xóa</button>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('debtOutList').innerHTML = out.length
+    ? out.map(debtCard).join('')
+    : '<div class="empty"><div class="empty-text">Không có khoản nào bạn đang nợ</div></div>';
+  document.getElementById('debtInList').innerHTML = inn.length
+    ? inn.map(debtCard).join('')
+    : '<div class="empty"><div class="empty-text">Không có khoản nào người ta nợ bạn</div></div>';
+}
+
+function renderSavings() {
+  // Banner: tiền tiết kiệm còn lại tháng này
+  const remaining = getSaveRemaining();
+  const m = getMonth();
+  const banner = document.getElementById('saveAllocateBanner');
+  if (m.salary > 0 && getAllocAmounts().save > 0) {
+    banner.style.display = 'block';
+    document.getElementById('saveLeftAmt').textContent = fmtVND(remaining);
+  } else {
+    banner.style.display = 'none';
+  }
+
+  const list = document.getElementById('savingList');
+  if (state.savings.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">Chưa có hũ tiết kiệm nào</div></div>';
+    return;
+  }
+  list.innerHTML = state.savings.map(s => {
+    const pct = s.target > 0 ? Math.min(100, s.current / s.target * 100) : 0;
+    return `<div class="list-item">
+      <div class="list-item-head">
+        <div>
+          <div class="list-item-title">${s.icon || '🎯'} ${s.name}</div>
+          <div class="list-item-meta">Mục tiêu ${fmtVND(s.target)}</div>
+        </div>
+        <div class="list-item-amount">${fmtVND(s.current)}</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-meta">${Math.round(pct)}% · còn thiếu ${fmtVND(Math.max(0, s.target - s.current))}</div>
+      <div class="action-row">
+        <button class="action-btn primary" onclick="depositSaving('${s.id}')">+ Nạp</button>
+        <button class="action-btn" onclick="withdrawSaving('${s.id}')">− Rút</button>
+        <button class="action-btn" onclick="editSaving('${s.id}')">Sửa</button>
+        <button class="action-btn danger" onclick="deleteSaving('${s.id}')">Xóa</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── SALARY INPUT ───
+document.getElementById('salaryInput').addEventListener('input', (e) => {
+  const v = parseNum(e.target.value);
+  e.target.value = v ? fmt(v) : '';
+});
+
+function saveSalary() {
+  const m = getMonth();
+  m.salary = parseNum(document.getElementById('salaryInput').value);
+  save();
+  render();
+  toast('Đã lưu lương');
+}
+
+// ─── MODAL HELPERS ───
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-bg').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('show');
+}
+document.getElementById('modal-bg').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-bg') closeModal();
+});
+
+// ─── TRANSACTION MODAL ───
+function openTxnModal(editId = null) {
+  const m = getMonth();
+  const t = editId ? m.transactions.find(x => x.id === editId) : null;
+  const today = new Date().toISOString().slice(0,10);
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">${t ? 'Sửa' : 'Thêm'} giao dịch</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Số tiền</label>
+      <div class="input-suffix">
+        <input type="text" id="txnAmt" inputmode="numeric" placeholder="0" value="${t ? fmt(t.amount) : ''}">
+        <span class="suffix">đ</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Danh mục</label>
+      <div class="cat-chips" id="catChips">
+        ${state.categories.map(c => `<button class="cat-chip ${t && t.catId === c.id ? 'active' : ''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`).join('')}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Ngày</label>
+      <input type="date" id="txnDate" value="${t ? t.date : today}">
+    </div>
+    <div class="field">
+      <label class="field-label">Ghi chú (tùy chọn)</label>
+      <input type="text" id="txnNote" placeholder="vd: cơm trưa với team" value="${t ? (t.note || '') : ''}">
+    </div>
+    <button class="btn btn-full" onclick="${t ? `updateTxn('${editId}')` : 'addTxn()'}">${t ? 'Lưu' : 'Thêm giao dịch'}</button>
+  `);
+  // Wire chips
+  document.querySelectorAll('#catChips .cat-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#catChips .cat-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+  // Format amount as typed
+  document.getElementById('txnAmt').addEventListener('input', (e) => {
+    const v = parseNum(e.target.value);
+    e.target.value = v ? fmt(v) : '';
+  });
+}
+
+function getSelectedCat() {
+  const el = document.querySelector('#catChips .cat-chip.active');
+  return el ? el.dataset.cat : null;
+}
+
+function addTxn() {
+  const amount = parseNum(document.getElementById('txnAmt').value);
+  const catId = getSelectedCat();
+  const date = document.getElementById('txnDate').value;
+  const note = document.getElementById('txnNote').value.trim();
+  if (!amount) return toast('Nhập số tiền');
+  if (!catId) return toast('Chọn danh mục');
+  if (!date) return toast('Chọn ngày');
+  const m = state.months[date.slice(0,7)] || initMonth(date.slice(0,7));
+  m.transactions.push({
+    id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    amount, catId, date, note
+  });
+  save();
+  closeModal();
+  render();
+  toast('Đã thêm giao dịch');
+}
+
+function updateTxn(id) {
+  const amount = parseNum(document.getElementById('txnAmt').value);
+  const catId = getSelectedCat();
+  const date = document.getElementById('txnDate').value;
+  const note = document.getElementById('txnNote').value.trim();
+  if (!amount || !catId || !date) return;
+  // Find the transaction across all months and move if needed
+  for (const mk of Object.keys(state.months)) {
+    const idx = state.months[mk].transactions.findIndex(t => t.id === id);
+    if (idx !== -1) {
+      state.months[mk].transactions.splice(idx, 1);
+      const newMk = date.slice(0,7);
+      const newM = state.months[newMk] || initMonth(newMk);
+      newM.transactions.push({ id, amount, catId, date, note });
+      break;
+    }
+  }
+  save();
+  closeModal();
+  render();
+}
+
+function deleteTxn(id) {
+  if (!confirm('Xóa giao dịch này?')) return;
+  for (const mk of Object.keys(state.months)) {
+    const idx = state.months[mk].transactions.findIndex(t => t.id === id);
+    if (idx !== -1) {
+      state.months[mk].transactions.splice(idx, 1);
+      break;
+    }
+  }
+  save();
+  render();
+}
+
+// ─── CATEGORY MODAL ───
+function openCatModal(editId = null) {
+  const c = editId ? state.categories.find(x => x.id === editId) : null;
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">${c ? 'Sửa' : 'Thêm'} danh mục</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Tên danh mục</label>
+      <input type="text" id="catName" placeholder="vd: Ăn uống" value="${c ? c.name : ''}">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Icon</label>
+        <input type="text" id="catIcon" placeholder="🍜" maxlength="2" value="${c ? c.icon : '💰'}">
+      </div>
+      <div class="field">
+        <label class="field-label">Loại</label>
+        <select id="catType">
+          <option value="fix" ${c && c.type === 'fix' ? 'selected' : ''}>Cố định</option>
+          <option value="flex" ${c && c.type === 'flex' ? 'selected' : ''}>Linh hoạt</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Hạn mức / tháng (VND)</label>
+      <div class="input-suffix">
+        <input type="text" id="catLimit" inputmode="numeric" placeholder="0" value="${c && c.limit ? fmt(c.limit) : ''}">
+        <span class="suffix">đ</span>
+      </div>
+    </div>
+    <button class="btn btn-full" onclick="${c ? `updateCat('${editId}')` : 'addCat()'}">${c ? 'Lưu' : 'Thêm'}</button>
+  `);
+  document.getElementById('catLimit').addEventListener('input', (e) => {
+    const v = parseNum(e.target.value);
+    e.target.value = v ? fmt(v) : '';
+  });
+}
+
+function addCat() {
+  const name = document.getElementById('catName').value.trim();
+  const icon = document.getElementById('catIcon').value.trim() || '💰';
+  const type = document.getElementById('catType').value;
+  const limit = parseNum(document.getElementById('catLimit').value);
+  if (!name) return toast('Nhập tên');
+  state.categories.push({
+    id: 'cat_' + Date.now(),
+    name, icon, type, limit
+  });
+  save();
+  closeModal();
+  render();
+}
+
+function editCat(id) { openCatModal(id); }
+
+function updateCat(id) {
+  const c = state.categories.find(x => x.id === id);
+  if (!c) return;
+  c.name = document.getElementById('catName').value.trim();
+  c.icon = document.getElementById('catIcon').value.trim() || '💰';
+  c.type = document.getElementById('catType').value;
+  c.limit = parseNum(document.getElementById('catLimit').value);
+  save();
+  closeModal();
+  render();
+}
+
+function deleteCat(id) {
+  if (!confirm('Xóa danh mục này? Giao dịch đã ghi vẫn được giữ nhưng sẽ không gán vào đâu.')) return;
+  state.categories = state.categories.filter(c => c.id !== id);
+  save();
+  render();
+}
+
+// ─── DEBT MODAL ───
+function openDebtModal(editId = null) {
+  const d = editId ? state.debts.find(x => x.id === editId) : null;
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">${d ? 'Sửa' : 'Thêm'} khoản nợ</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Loại</label>
+      <div class="toggle-row">
+        <button class="toggle-btn ${!d || d.type === 'out' ? 'active' : ''}" data-debt="out">Tôi đang nợ</button>
+        <button class="toggle-btn ${d && d.type === 'in' ? 'active' : ''}" data-debt="in">Người nợ tôi</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Tên người / mô tả</label>
+      <input type="text" id="debtWho" placeholder="vd: anh A — vay tiền nhà" value="${d ? d.who : ''}">
+    </div>
+    <div class="field">
+      <label class="field-label">Số tiền</label>
+      <div class="input-suffix">
+        <input type="text" id="debtAmt" inputmode="numeric" placeholder="0" value="${d ? fmt(d.amount) : ''}">
+        <span class="suffix">đ</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Hạn (tùy chọn)</label>
+      <input type="date" id="debtDue" value="${d ? (d.dueDate || '') : ''}">
+    </div>
+    <div class="field">
+      <label class="field-label">Ghi chú</label>
+      <input type="text" id="debtNote" placeholder="tùy chọn" value="${d ? (d.note || '') : ''}">
+    </div>
+    <button class="btn btn-full" onclick="${d ? `updateDebt('${editId}')` : 'addDebt()'}">${d ? 'Lưu' : 'Thêm'}</button>
+  `);
+  document.querySelectorAll('[data-debt]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('[data-debt]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+  document.getElementById('debtAmt').addEventListener('input', (e) => {
+    const v = parseNum(e.target.value);
+    e.target.value = v ? fmt(v) : '';
+  });
+}
+
+function addDebt() {
+  const type = document.querySelector('[data-debt].active').dataset.debt;
+  const who = document.getElementById('debtWho').value.trim();
+  const amount = parseNum(document.getElementById('debtAmt').value);
+  const dueDate = document.getElementById('debtDue').value;
+  const note = document.getElementById('debtNote').value.trim();
+  if (!who || !amount) return toast('Nhập đủ thông tin');
+  state.debts.push({
+    id: 'debt_' + Date.now(),
+    type, who, amount, dueDate, note, paid: false
+  });
+  save();
+  closeModal();
+  render();
+}
+
+function editDebt(id) { openDebtModal(id); }
+
+function updateDebt(id) {
+  const d = state.debts.find(x => x.id === id);
+  if (!d) return;
+  d.type = document.querySelector('[data-debt].active').dataset.debt;
+  d.who = document.getElementById('debtWho').value.trim();
+  d.amount = parseNum(document.getElementById('debtAmt').value);
+  d.dueDate = document.getElementById('debtDue').value;
+  d.note = document.getElementById('debtNote').value.trim();
+  save();
+  closeModal();
+  render();
+}
+
+function toggleDebtPaid(id) {
+  const d = state.debts.find(x => x.id === id);
+  if (!d) return;
+  d.paid = !d.paid;
+  save();
+  render();
+}
+
+function deleteDebt(id) {
+  if (!confirm('Xóa khoản nợ này?')) return;
+  state.debts = state.debts.filter(d => d.id !== id);
+  save();
+  render();
+}
+
+// ─── SAVING MODAL ───
+function openSaveModal(editId = null) {
+  const s = editId ? state.savings.find(x => x.id === editId) : null;
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">${s ? 'Sửa' : 'Tạo'} hũ tiết kiệm</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Tên hũ</label>
+      <input type="text" id="saveName" placeholder="vd: Du lịch Phuket 2026" value="${s ? s.name : ''}">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Icon</label>
+        <input type="text" id="saveIcon" maxlength="2" placeholder="🎯" value="${s ? s.icon : '🎯'}">
+      </div>
+      <div class="field">
+        <label class="field-label">Mục tiêu</label>
+        <div class="input-suffix">
+          <input type="text" id="saveTarget" inputmode="numeric" placeholder="0" value="${s ? fmt(s.target) : ''}">
+          <span class="suffix">đ</span>
+        </div>
+      </div>
+    </div>
+    ${!s ? `<div class="field">
+      <label class="field-label">Số dư ban đầu (tùy chọn)</label>
+      <div class="input-suffix">
+        <input type="text" id="saveCurrent" inputmode="numeric" placeholder="0">
+        <span class="suffix">đ</span>
+      </div>
+    </div>` : ''}
+    <button class="btn btn-full" onclick="${s ? `updateSaving('${editId}')` : 'addSaving()'}">${s ? 'Lưu' : 'Tạo hũ'}</button>
+  `);
+  ['saveTarget', 'saveCurrent'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', (e) => {
+      const v = parseNum(e.target.value);
+      e.target.value = v ? fmt(v) : '';
+    });
+  });
+}
+
+function addSaving() {
+  const name = document.getElementById('saveName').value.trim();
+  const icon = document.getElementById('saveIcon').value.trim() || '🎯';
+  const target = parseNum(document.getElementById('saveTarget').value);
+  const current = parseNum(document.getElementById('saveCurrent').value);
+  if (!name || !target) return toast('Nhập tên và mục tiêu');
+  state.savings.push({
+    id: 'save_' + Date.now(),
+    name, icon, target, current, history: current ? [{date: new Date().toISOString().slice(0,10), amount: current}] : []
+  });
+  save();
+  closeModal();
+  render();
+}
+
+function editSaving(id) { openSaveModal(id); }
+
+function updateSaving(id) {
+  const s = state.savings.find(x => x.id === id);
+  if (!s) return;
+  s.name = document.getElementById('saveName').value.trim();
+  s.icon = document.getElementById('saveIcon').value.trim() || '🎯';
+  s.target = parseNum(document.getElementById('saveTarget').value);
+  save();
+  closeModal();
+  render();
+}
+
+function depositSaving(id) {
+  const s = state.savings.find(x => x.id === id);
+  if (!s) return;
+  const remaining = getSaveRemaining();
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Nạp vào ${s.name}</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    ${remaining > 0 ? `<div class="tip">Còn <strong>${fmtVND(remaining)}</strong> tiết kiệm tháng này chưa phân bổ.</div>` : ''}
+    <div class="field">
+      <label class="field-label">Số tiền nạp</label>
+      <div class="input-suffix">
+        <input type="text" id="depAmt" inputmode="numeric" placeholder="0">
+        <span class="suffix">đ</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Trừ vào tiết kiệm tháng này?</label>
+      <div class="toggle-row">
+        <button class="toggle-btn active" data-fromsalary="yes">Có</button>
+        <button class="toggle-btn" data-fromsalary="no">Không (nguồn khác)</button>
+      </div>
+    </div>
+    <button class="btn btn-full" onclick="doDeposit('${id}')">Nạp</button>
+  `);
+  document.getElementById('depAmt').addEventListener('input', (e) => {
+    const v = parseNum(e.target.value);
+    e.target.value = v ? fmt(v) : '';
+  });
+  document.querySelectorAll('[data-fromsalary]').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('[data-fromsalary]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+}
+
+function doDeposit(id) {
+  const s = state.savings.find(x => x.id === id);
+  if (!s) return;
+  const amt = parseNum(document.getElementById('depAmt').value);
+  const fromSalary = document.querySelector('[data-fromsalary].active').dataset.fromsalary === 'yes';
+  if (!amt) return;
+  s.current += amt;
+  s.history = s.history || [];
+  s.history.push({ date: new Date().toISOString().slice(0,10), amount: amt, fromSalary });
+  if (fromSalary) {
+    const m = getMonth();
+    m.saveAllocated = (m.saveAllocated || 0) + amt;
+  }
+  save();
+  closeModal();
+  render();
+  toast('Đã nạp ' + fmtVND(amt));
+}
+
+function withdrawSaving(id) {
+  const s = state.savings.find(x => x.id === id);
+  if (!s) return;
+  const amt = parseNum(prompt('Rút bao nhiêu? (VND)', ''));
+  if (!amt) return;
+  s.current = Math.max(0, s.current - amt);
+  s.history = s.history || [];
+  s.history.push({ date: new Date().toISOString().slice(0,10), amount: -amt });
+  save();
+  render();
+}
+
+function deleteSaving(id) {
+  if (!confirm('Xóa hũ này? Lịch sử nạp/rút cũng sẽ mất.')) return;
+  state.savings = state.savings.filter(s => s.id !== id);
+  save();
+  render();
+}
+
+// ─── DATA EXPORT/IMPORT ───
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `moneyos-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!confirm('Import sẽ thay thế toàn bộ dữ liệu hiện tại. Tiếp tục?')) return;
+      state = data;
+      save();
+      render();
+      buildMonthOptions();
+      toast('Import thành công');
+    } catch(err) {
+      toast('File không hợp lệ');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Xóa toàn bộ dữ liệu MoneyOS? Không thể hoàn tác.')) return;
+  if (!confirm('Bạn chắc chắn? Hãy export backup trước nếu cần.')) return;
+  localStorage.removeItem(DB_KEY);
+  location.reload();
+}
+
+// ─── TOAST ───
+function toast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `
+    position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:var(--bg); padding:10px 18px; border-radius:100px;
+    font-size:13px; font-weight:600; z-index:200; box-shadow:0 4px 16px rgba(0,0,0,0.2);
+    animation: fadeUp 0.3s; max-width:90%;
+  `;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
+}
+
+// ─── INIT ───
+load();
+bootstrap();
+
+// Allow Enter key on password field to submit
+document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') doAuth();
+});
+document.getElementById('loginEmail').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+});
+</script>
+</body>
+</html>
