@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="MoneyOS">
+<meta name="apple-mobile-web-app-title" content="Finance Hub">
 <meta name="theme-color" content="#0F1419">
-<title>MoneyOS — Harry</title>
+<title>Finance Hub — Harry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -935,7 +935,7 @@ body {
 <div id="loginScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;overflow-y:auto;padding:40px 20px;">
   <div style="max-width:380px;margin:40px auto;">
     <div style="text-align:center;margin-bottom:32px;">
-      <div style="font-family:var(--font-display);font-style:italic;font-weight:600;font-size:42px;letter-spacing:-0.02em;">MoneyOS<span style="display:inline-block;width:12px;height:12px;background:var(--accent);border-radius:50%;margin-left:6px;vertical-align:middle;"></span></div>
+      <div style="font-family:var(--font-display);font-style:italic;font-weight:600;font-size:42px;letter-spacing:-0.02em;">Finance Hub<span style="display:inline-block;width:12px;height:12px;background:var(--accent);border-radius:50%;margin-left:6px;vertical-align:middle;"></span></div>
       <div style="font-size:14px;color:var(--ink-mute);margin-top:8px;">Đăng nhập để đồng bộ trên mọi thiết bị</div>
     </div>
 
@@ -971,7 +971,7 @@ body {
 <!-- ══════════════════ HEADER ══════════════════ -->
 <header class="header">
   <div class="header-top">
-    <div class="brand">MoneyOS<span class="brand-dot"></span></div>
+    <div class="brand">Finance Hub<span class="brand-dot"></span></div>
     <div style="display:flex;align-items:center;gap:8px;">
       <span id="syncIndicator" style="font-size:11px;color:var(--ink-mute);font-family:var(--font-mono);display:flex;align-items:center;gap:4px;"></span>
       <div class="month-pill">
@@ -990,7 +990,7 @@ body {
     <div class="hero-amount" id="heroRemaining">0<span class="unit">đ</span></div>
     <div class="hero-stats">
       <div>
-        <div class="hero-stat-label">Lương</div>
+        <div class="hero-stat-label">Thu nhập</div>
         <div class="hero-stat-value" id="heroSalary">0đ</div>
       </div>
       <div>
@@ -1098,21 +1098,19 @@ body {
 
 <!-- ══════════════════ ALLOCATION ══════════════════ -->
 <section class="view" id="view-allocate">
-  <div class="section-label">Lương tháng này</div>
+  <div class="flex-row" style="margin-bottom:14px;">
+    <div class="section-label" style="margin:0;">Thu nhập tháng này</div>
+    <button class="btn btn-sm" onclick="openTxnModal(null, 'income')">+ Thu nhập</button>
+  </div>
 
   <div class="card">
-    <div class="field" style="margin-bottom:0;">
-      <label class="field-label">Tổng lương (VND)</label>
-      <div class="input-suffix">
-        <input type="text" id="salaryInput" inputmode="numeric" placeholder="vd: 30.000.000">
-        <span class="suffix">đ</span>
-      </div>
-    </div>
-    <button class="btn btn-full" style="margin-top:14px;" onclick="saveSalary()">Lưu lương</button>
+    <div style="font-size:12px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Tổng đã nhận</div>
+    <div style="font-family:var(--font-display);font-weight:500;font-size:34px;letter-spacing:-0.02em;" id="incomeTotalBig">0đ</div>
+    <div style="font-size:12px;color:var(--ink-mute);font-family:var(--font-mono);margin-top:4px;" id="incomeCountText">— giao dịch</div>
   </div>
 
   <div class="tip">
-    <strong>Cách tính:</strong> Cố định &amp; Linh hoạt tự lấy tổng <em>hạn mức</em> từ các danh mục trong tab Budget. Tiết kiệm = Lương − (Cố định + Linh hoạt).
+    <strong>Cách tính:</strong> Tổng thu nhập = tất cả giao dịch loại "Thu" trong tháng. Cố định &amp; Linh hoạt lấy tổng <em>hạn mức</em> từ Budget. Tiết kiệm = Thu nhập − (Cố định + Linh hoạt).
   </div>
 
   <div class="alloc-summary" id="allocSummary">
@@ -1134,7 +1132,12 @@ body {
   </div>
 
   <div id="allocWarning" style="display:none;background:var(--red-soft);color:var(--red);padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;">
-    ⚠️ <strong>Thâm hụt:</strong> Tổng Cố định + Linh hoạt đang <span id="deficitAmt">0đ</span> vượt quá lương. Hãy giảm limit ở Budget hoặc tăng lương.
+    ⚠️ <strong>Thâm hụt:</strong> Tổng Cố định + Linh hoạt đang <span id="deficitAmt">0đ</span> vượt quá thu nhập. Hãy giảm limit ở Budget hoặc thêm thu nhập.
+  </div>
+
+  <div class="card" style="background:var(--surface-elev);">
+    <div style="font-family:var(--font-display);font-weight:600;font-size:16px;margin-bottom:10px;">Chi tiết thu nhập</div>
+    <div id="incomeBreakdown" style="font-size:13px;"></div>
   </div>
 
   <div class="card" style="background:var(--surface-elev);">
@@ -1149,7 +1152,7 @@ body {
 <!-- ══════════════════ BUDGET ══════════════════ -->
 <section class="view" id="view-budget">
   <div class="flex-row" style="margin-bottom:14px;">
-    <div class="section-label" style="margin:0;">Danh mục ngân sách</div>
+    <div class="section-label" style="margin:0;">Danh mục</div>
     <button class="btn btn-sm" onclick="openCatModal()">+ Thêm</button>
   </div>
 
@@ -1158,14 +1161,37 @@ body {
 
   <div class="section-label" style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-top:18px;">Chi phí linh hoạt</div>
   <div id="budgetFlexList"></div>
+
+  <div class="section-label" style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:var(--green);margin-top:18px;">Nguồn thu nhập</div>
+  <div id="budgetIncomeList"></div>
 </section>
 
 <!-- ══════════════════ TRANSACTIONS ══════════════════ -->
 <section class="view" id="view-txn">
   <div class="flex-row" style="margin-bottom:14px;">
     <div class="section-label" style="margin:0;">Giao dịch tháng này</div>
-    <button class="btn btn-sm" onclick="openTxnModal()">+ Mới</button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-sm btn-secondary" onclick="openTxnModal(null, 'income')" style="color:var(--green);">+ Thu</button>
+      <button class="btn btn-sm" onclick="openTxnModal(null, 'expense')">+ Chi</button>
+    </div>
   </div>
+
+  <!-- Summary card -->
+  <div class="card" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px;">
+    <div>
+      <div style="font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;">Thu</div>
+      <div style="font-family:var(--font-display);font-weight:500;font-size:16px;color:var(--green);" id="txnTotalIncome">0đ</div>
+    </div>
+    <div>
+      <div style="font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;">Chi</div>
+      <div style="font-family:var(--font-display);font-weight:500;font-size:16px;color:var(--red);" id="txnTotalExpense">0đ</div>
+    </div>
+    <div>
+      <div style="font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;">Còn lại</div>
+      <div style="font-family:var(--font-display);font-weight:500;font-size:16px;" id="txnTotalNet">0đ</div>
+    </div>
+  </div>
+
   <div id="txnList"></div>
 </section>
 
@@ -1238,7 +1264,7 @@ body {
 
   <div class="card" style="background:var(--surface-elev);">
     <p style="font-size:12px;color:var(--ink-mute);text-align:center;font-family:var(--font-display);font-style:italic;">
-      MoneyOS · built for Harry · v2.0 cloud sync
+      Finance Hub · built for Harry · v2.1 cloud sync
     </p>
   </div>
 
@@ -1253,7 +1279,7 @@ body {
   </button>
   <button class="tab-btn" data-view="allocate">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
-    <span>Lương</span>
+    <span>Thu nhập</span>
   </button>
   <button class="tab-btn" data-view="budget">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -1313,6 +1339,12 @@ let state = {
     { id: 'fun', name: 'Giải trí', type: 'flex', icon: '🎮', limit: 0 },
     { id: 'shop', name: 'Mua sắm', type: 'flex', icon: '🛍️', limit: 0 },
   ],
+  incomeCategories: [
+    { id: 'salary', name: 'Lương', icon: '💵' },
+    { id: 'bonus', name: 'Thưởng', icon: '🎁' },
+    { id: 'freelance', name: 'Freelance', icon: '💼' },
+    { id: 'other_income', name: 'Khác', icon: '✨' },
+  ],
   debts: [],   // {id, type:'out'|'in', who, amount, dueDate, note, paid}
   savings: [], // {id, name, target, current, icon, history:[{date,amount}]}
 };
@@ -1325,12 +1357,40 @@ function getCurrentMonthKey() {
 function initMonth(mk) {
   if (!state.months[mk]) {
     state.months[mk] = {
-      salary: 0,
-      transactions: [], // {id, date, catId, amount, note}
+      transactions: [], // {id, date, kind:'expense'|'income', catId, amount, note}
       saveAllocated: 0, // tổng đã đẩy vào các hũ tháng này
     };
   }
+  // Migrate old data: ensure incomeCategories exists
+  if (!state.incomeCategories) {
+    state.incomeCategories = [
+      { id: 'salary', name: 'Lương', icon: '💵' },
+      { id: 'bonus', name: 'Thưởng', icon: '🎁' },
+      { id: 'freelance', name: 'Freelance', icon: '💼' },
+      { id: 'other_income', name: 'Khác', icon: '✨' },
+    ];
+  }
+  // Migrate old transactions without kind field
+  if (state.months[mk].transactions) {
+    state.months[mk].transactions.forEach(t => {
+      if (!t.kind) t.kind = 'expense';
+    });
+  }
   return state.months[mk];
+}
+
+// Helper to get total income for a month
+function getTotalIncome(mk = state.currentMonth) {
+  const m = state.months[mk];
+  if (!m) return 0;
+  return m.transactions.filter(t => t.kind === 'income').reduce((s, t) => s + t.amount, 0);
+}
+
+// Helper to get income by category
+function getIncomeByCategory(catId, mk = state.currentMonth) {
+  const m = state.months[mk];
+  if (!m) return 0;
+  return m.transactions.filter(t => t.kind === 'income' && t.catId === catId).reduce((s, t) => s + t.amount, 0);
 }
 
 function save() {
@@ -1670,18 +1730,18 @@ function getMonth() { return state.months[state.currentMonth] || initMonth(state
 
 function getCategorySpent(catId) {
   const m = getMonth();
-  return m.transactions.filter(t => t.catId === catId).reduce((s, t) => s + t.amount, 0);
+  return m.transactions.filter(t => t.kind === 'expense' && t.catId === catId).reduce((s, t) => s + t.amount, 0);
 }
 
 function getTotalSpent() {
   const m = getMonth();
-  return m.transactions.reduce((s, t) => s + t.amount, 0);
+  return m.transactions.filter(t => t.kind === 'expense').reduce((s, t) => s + t.amount, 0);
 }
 
 function getSpentByType(type) {
   const m = getMonth();
   const ids = state.categories.filter(c => c.type === type).map(c => c.id);
-  return m.transactions.filter(t => ids.includes(t.catId)).reduce((s, t) => s + t.amount, 0);
+  return m.transactions.filter(t => t.kind === 'expense' && ids.includes(t.catId)).reduce((s, t) => s + t.amount, 0);
 }
 
 function getTotalLimit(type) {
@@ -1689,10 +1749,10 @@ function getTotalLimit(type) {
 }
 
 function getAllocAmounts() {
-  const m = getMonth();
+  const income = getTotalIncome();
   const fix = getTotalLimit('fix');
   const flex = getTotalLimit('flex');
-  const save = Math.max(0, m.salary - fix - flex);
+  const save = Math.max(0, income - fix - flex);
   return { fix, flex, save };
 }
 
@@ -1714,15 +1774,16 @@ function render() {
 
 function renderDashboard() {
   const m = getMonth();
+  const income = getTotalIncome();
   const spent = getTotalSpent();
-  const remaining = m.salary - spent;
+  const remaining = income - spent;
 
   document.getElementById('heroRemaining').innerHTML = fmt(remaining) + '<span class="unit">đ</span>';
-  document.getElementById('heroSalary').textContent = fmtVND(m.salary);
+  document.getElementById('heroSalary').textContent = fmtVND(income);
   document.getElementById('heroSpent').textContent = fmtVND(spent);
 
   // ─── Burn rate / Forecast ───
-  renderBurnRate(m, spent);
+  renderBurnRate(m, spent, income);
 
   // ─── Net worth ───
   renderNetWorth();
@@ -1803,9 +1864,9 @@ function getMonthMeta(monthKey) {
 }
 
 // ─── Burn rate / Forecast ───
-function renderBurnRate(m, spent) {
+function renderBurnRate(m, spent, income) {
   const card = document.getElementById('burnCard');
-  if (!m.salary || spent === 0) {
+  if (!income || spent === 0) {
     card.style.display = 'none';
     return;
   }
@@ -1864,7 +1925,8 @@ function renderNetWorth() {
 // ─── Daily spending chart (SVG bar chart) ───
 function renderDailyChart(m) {
   const card = document.getElementById('dailyChartCard');
-  if (m.transactions.length === 0) {
+  const expenses = m.transactions.filter(t => t.kind === 'expense');
+  if (expenses.length === 0) {
     card.style.display = 'none';
     return;
   }
@@ -1872,7 +1934,7 @@ function renderDailyChart(m) {
 
   const meta = getMonthMeta(state.currentMonth);
   const byDay = new Array(meta.daysInMonth).fill(0);
-  m.transactions.forEach(t => {
+  expenses.forEach(t => {
     const day = parseInt(t.date.split('-')[2]);
     if (day >= 1 && day <= meta.daysInMonth) byDay[day - 1] += t.amount;
   });
@@ -1910,7 +1972,7 @@ function renderMoM(m, currSpent) {
     return;
   }
   card.style.display = 'block';
-  const prevSpent = prevM.transactions.reduce((s, t) => s + t.amount, 0);
+  const prevSpent = prevM.transactions.filter(t => t.kind === 'expense').reduce((s, t) => s + t.amount, 0);
   document.getElementById('momPrev').textContent = fmtVND(prevSpent);
   document.getElementById('momCurr').textContent = fmtVND(currSpent);
 
@@ -1929,7 +1991,7 @@ function renderMoM(m, currSpent) {
 // ─── Top categories ───
 function renderTopCategories(m) {
   const byCategory = {};
-  m.transactions.forEach(t => {
+  m.transactions.filter(t => t.kind === 'expense').forEach(t => {
     byCategory[t.catId] = (byCategory[t.catId] || 0) + t.amount;
   });
   const top = Object.entries(byCategory)
@@ -2012,14 +2074,17 @@ function renderDueDebts() {
 }
 
 function renderTxnItem(t, showDate = true) {
-  const cat = state.categories.find(c => c.id === t.catId) || { name: 'Khác', icon: '💰' };
+  const cat = t.kind === 'income'
+    ? (state.incomeCategories.find(c => c.id === t.catId) || { name: 'Khác', icon: '✨' })
+    : (state.categories.find(c => c.id === t.catId) || { name: 'Khác', icon: '💰' });
+  const isIncome = t.kind === 'income';
   return `<div class="txn-item">
-    <div class="txn-icon">${cat.icon}</div>
+    <div class="txn-icon" style="${isIncome ? 'background:var(--green-soft);' : ''}">${cat.icon}</div>
     <div class="txn-body">
       <div class="txn-cat">${cat.name}</div>
       <div class="txn-note">${showDate ? fmtDate(t.date) + ' · ' : ''}${t.note || '—'}</div>
     </div>
-    <div class="txn-amount">−${fmtVND(t.amount)}</div>
+    <div class="txn-amount ${isIncome ? 'income' : ''}" style="${isIncome ? 'color:var(--green);' : ''}">${isIncome ? '+' : '−'}${fmtVND(t.amount)}</div>
     <button class="txn-del" onclick="deleteTxn('${t.id}')">×</button>
   </div>`;
 }
@@ -2044,28 +2109,54 @@ function renderBudgetItem(c, compact = false) {
 
 function renderAllocate() {
   const m = getMonth();
-  document.getElementById('salaryInput').value = m.salary ? fmt(m.salary) : '';
+  const income = getTotalIncome();
+  const incomeTxns = m.transactions.filter(t => t.kind === 'income');
+
+  document.getElementById('incomeTotalBig').textContent = fmtVND(income);
+  document.getElementById('incomeCountText').textContent =
+    incomeTxns.length === 0 ? 'Chưa có thu nhập tháng này' : `${incomeTxns.length} giao dịch`;
 
   const amt = getAllocAmounts();
-  const totalForPct = m.salary || 1;
-  document.getElementById('sumFixPct').textContent = m.salary ? Math.round(amt.fix / totalForPct * 100) + '%' : '—';
-  document.getElementById('sumFlexPct').textContent = m.salary ? Math.round(amt.flex / totalForPct * 100) + '%' : '—';
-  document.getElementById('sumSavePct').textContent = m.salary ? Math.round(amt.save / totalForPct * 100) + '%' : '—';
+  const totalForPct = income || 1;
+  document.getElementById('sumFixPct').textContent = income ? Math.round(amt.fix / totalForPct * 100) + '%' : '—';
+  document.getElementById('sumFlexPct').textContent = income ? Math.round(amt.flex / totalForPct * 100) + '%' : '—';
+  document.getElementById('sumSavePct').textContent = income ? Math.round(amt.save / totalForPct * 100) + '%' : '—';
   document.getElementById('sumFixAmt').textContent = fmtVND(amt.fix);
   document.getElementById('sumFlexAmt').textContent = fmtVND(amt.flex);
   document.getElementById('sumSaveAmt').textContent = fmtVND(amt.save);
 
   // Warning if deficit
-  const deficit = (amt.fix + amt.flex) - m.salary;
+  const deficit = (amt.fix + amt.flex) - income;
   const warn = document.getElementById('allocWarning');
-  if (m.salary > 0 && deficit > 0) {
+  if (income > 0 && deficit > 0) {
     warn.style.display = 'block';
     document.getElementById('deficitAmt').textContent = fmtVND(deficit);
   } else {
     warn.style.display = 'none';
   }
 
-  // Breakdown by category
+  // Income breakdown by category
+  const incomeBreak = document.getElementById('incomeBreakdown');
+  if (incomeTxns.length === 0) {
+    incomeBreak.innerHTML = '<div style="color:var(--ink-mute);font-size:13px;text-align:center;padding:12px;">Chưa có thu nhập. Bấm "+ Thu nhập" ở trên để thêm.</div>';
+  } else {
+    const byCategory = {};
+    incomeTxns.forEach(t => {
+      byCategory[t.catId] = (byCategory[t.catId] || 0) + t.amount;
+    });
+    let html = '<div class="cat-breakdown">';
+    Object.entries(byCategory)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([catId, amount]) => {
+        const cat = state.incomeCategories.find(c => c.id === catId) || { name: 'Khác', icon: '✨' };
+        const pct = Math.round(amount / income * 100);
+        html += `<div class="cat-row"><span class="cat-row-name">${cat.icon} ${cat.name} <span style="color:var(--ink-mute);font-family:var(--font-mono);font-size:11px;">${pct}%</span></span><span class="cat-row-amt" style="color:var(--green);">+${fmtVND(amount)}</span></div>`;
+      });
+    html += '</div>';
+    incomeBreak.innerHTML = html;
+  }
+
+  // Breakdown by category (budget)
   const fixCats = state.categories.filter(c => c.type === 'fix');
   const flexCats = state.categories.filter(c => c.type === 'flex');
   const breakdown = document.getElementById('allocBreakdown');
@@ -2101,11 +2192,43 @@ function renderBudget() {
   document.getElementById('budgetFlexList').innerHTML = flex.length
     ? flex.map(c => renderBudgetItem(c)).join('')
     : '<div class="empty"><div class="empty-text">Chưa có danh mục linh hoạt</div></div>';
+
+  // Income categories
+  const incList = document.getElementById('budgetIncomeList');
+  if (state.incomeCategories.length === 0) {
+    incList.innerHTML = '<div class="empty"><div class="empty-text">Chưa có nguồn thu nhập</div></div>';
+  } else {
+    incList.innerHTML = state.incomeCategories.map(c => {
+      const totalThisMonth = getIncomeByCategory(c.id);
+      return `<div class="card-flat">
+        <div class="progress-row">
+          <span class="progress-name">${c.icon} ${c.name}</span>
+          <span class="progress-fig" style="color:var(--green);"><span class="pct">${fmtVND(totalThisMonth)}</span></span>
+        </div>
+        <div class="progress-meta">Đã nhận tháng này</div>
+        <div class="action-row">
+          <button class="action-btn" onclick="editCat('${c.id}')">Sửa</button>
+          <button class="action-btn danger" onclick="deleteCat('${c.id}')">Xóa</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 function renderTxn() {
   const m = getMonth();
   const txns = [...m.transactions].sort((a,b) => b.date.localeCompare(a.date));
+
+  // Summary cards
+  const totalIncome = getTotalIncome();
+  const totalExpense = getTotalSpent();
+  const net = totalIncome - totalExpense;
+  document.getElementById('txnTotalIncome').textContent = fmtVND(totalIncome);
+  document.getElementById('txnTotalExpense').textContent = fmtVND(totalExpense);
+  const netEl = document.getElementById('txnTotalNet');
+  netEl.textContent = fmtVND(net);
+  netEl.style.color = net >= 0 ? 'var(--ink)' : 'var(--red)';
+
   const list = document.getElementById('txnList');
   if (txns.length === 0) {
     list.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">Chưa có giao dịch nào tháng này</div></div>';
@@ -2118,11 +2241,16 @@ function renderTxn() {
     byDay[t.date].push(t);
   });
   list.innerHTML = Object.keys(byDay).sort((a,b) => b.localeCompare(a)).map(date => {
-    const dayTotal = byDay[date].reduce((s,t) => s+t.amount, 0);
+    const dayIncome = byDay[date].filter(t => t.kind === 'income').reduce((s,t) => s+t.amount, 0);
+    const dayExpense = byDay[date].filter(t => t.kind === 'expense').reduce((s,t) => s+t.amount, 0);
+    let totalText = '';
+    if (dayIncome && dayExpense) totalText = `+${fmtVND(dayIncome)} / −${fmtVND(dayExpense)}`;
+    else if (dayIncome) totalText = `+${fmtVND(dayIncome)}`;
+    else totalText = `−${fmtVND(dayExpense)}`;
     return `<div class="txn-day">
       <div class="txn-day-label">
         <span>${fmtDateFull(date)}</span>
-        <span class="txn-day-total">−${fmtVND(dayTotal)}</span>
+        <span class="txn-day-total">${totalText}</span>
       </div>
       ${byDay[date].map(t => renderTxnItem(t, false)).join('')}
     </div>`;
@@ -2167,9 +2295,9 @@ function renderDebt() {
 function renderSavings() {
   // Banner: tiền tiết kiệm còn lại tháng này
   const remaining = getSaveRemaining();
-  const m = getMonth();
+  const income = getTotalIncome();
   const banner = document.getElementById('saveAllocateBanner');
-  if (m.salary > 0 && getAllocAmounts().save > 0) {
+  if (income > 0 && getAllocAmounts().save > 0) {
     banner.style.display = 'block';
     document.getElementById('saveLeftAmt').textContent = fmtVND(remaining);
   } else {
@@ -2203,20 +2331,6 @@ function renderSavings() {
   }).join('');
 }
 
-// ─── SALARY INPUT ───
-document.getElementById('salaryInput').addEventListener('input', (e) => {
-  const v = parseNum(e.target.value);
-  e.target.value = v ? fmt(v) : '';
-});
-
-function saveSalary() {
-  const m = getMonth();
-  m.salary = parseNum(document.getElementById('salaryInput').value);
-  save();
-  render();
-  toast('Đã lưu lương');
-}
-
 // ─── MODAL HELPERS ───
 function openModal(html) {
   document.getElementById('modal-content').innerHTML = html;
@@ -2230,14 +2344,22 @@ document.getElementById('modal-bg').addEventListener('click', (e) => {
 });
 
 // ─── TRANSACTION MODAL ───
-function openTxnModal(editId = null) {
+function openTxnModal(editId = null, defaultKind = null) {
   const m = getMonth();
   const t = editId ? m.transactions.find(x => x.id === editId) : null;
   const today = new Date().toISOString().slice(0,10);
+  const kind = t ? t.kind : (defaultKind || 'expense');
+
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${t ? 'Sửa' : 'Thêm'} giao dịch</div>
       <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <div class="toggle-row">
+        <button class="toggle-btn ${kind === 'expense' ? 'active' : ''}" data-kind="expense">💸 Chi</button>
+        <button class="toggle-btn ${kind === 'income' ? 'active' : ''}" data-kind="income">💰 Thu</button>
+      </div>
     </div>
     <div class="field">
       <label class="field-label">Số tiền</label>
@@ -2247,10 +2369,8 @@ function openTxnModal(editId = null) {
       </div>
     </div>
     <div class="field">
-      <label class="field-label">Danh mục</label>
-      <div class="cat-chips" id="catChips">
-        ${state.categories.map(c => `<button class="cat-chip ${t && t.catId === c.id ? 'active' : ''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`).join('')}
-      </div>
+      <label class="field-label" id="catLabel">Danh mục chi</label>
+      <div class="cat-chips" id="catChips"></div>
     </div>
     <div class="field">
       <label class="field-label">Ngày</label>
@@ -2262,13 +2382,42 @@ function openTxnModal(editId = null) {
     </div>
     <button class="btn btn-full" onclick="${t ? `updateTxn('${editId}')` : 'addTxn()'}">${t ? 'Lưu' : 'Thêm giao dịch'}</button>
   `);
-  // Wire chips
-  document.querySelectorAll('#catChips .cat-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('#catChips .cat-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
+
+  // Render category chips for current kind
+  function renderChips(activeKind, selectedCatId) {
+    const cats = activeKind === 'income' ? state.incomeCategories : state.categories;
+    document.getElementById('catLabel').textContent = activeKind === 'income' ? 'Nguồn thu nhập' : 'Danh mục chi';
+    document.getElementById('catChips').innerHTML = cats.map(c =>
+      `<button class="cat-chip ${selectedCatId === c.id ? 'active' : ''}" data-cat="${c.id}">${c.icon} ${c.name}</button>`
+    ).join('') + `<button class="cat-chip" data-newcat="${activeKind}" style="border-style:dashed;">+ Thêm</button>`;
+    // wire chips
+    document.querySelectorAll('#catChips .cat-chip[data-cat]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#catChips .cat-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+    const newCatBtn = document.querySelector('#catChips [data-newcat]');
+    if (newCatBtn) {
+      newCatBtn.addEventListener('click', () => {
+        const k = newCatBtn.dataset.newcat;
+        closeModal();
+        openCatModal(null, k === 'income' ? 'income' : 'flex');
+      });
+    }
+  }
+
+  renderChips(kind, t ? t.catId : null);
+
+  // Wire kind toggle
+  document.querySelectorAll('[data-kind]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-kind]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderChips(btn.dataset.kind, null);
     });
   });
+
   // Format amount as typed
   document.getElementById('txnAmt').addEventListener('input', (e) => {
     const v = parseNum(e.target.value);
@@ -2280,29 +2429,37 @@ function getSelectedCat() {
   const el = document.querySelector('#catChips .cat-chip.active');
   return el ? el.dataset.cat : null;
 }
+function getSelectedKind() {
+  const el = document.querySelector('[data-kind].active');
+  return el ? el.dataset.kind : 'expense';
+}
 
 function addTxn() {
   const amount = parseNum(document.getElementById('txnAmt').value);
   const catId = getSelectedCat();
+  const kind = getSelectedKind();
   const date = document.getElementById('txnDate').value;
   const note = document.getElementById('txnNote').value.trim();
   if (!amount) return toast('Nhập số tiền');
   if (!catId) return toast('Chọn danh mục');
   if (!date) return toast('Chọn ngày');
-  const m = state.months[date.slice(0,7)] || initMonth(date.slice(0,7));
+  const mk = date.slice(0,7);
+  if (!state.months[mk]) initMonth(mk);
+  const m = state.months[mk];
   m.transactions.push({
     id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-    amount, catId, date, note
+    amount, kind, catId, date, note
   });
   save();
   closeModal();
   render();
-  toast('Đã thêm giao dịch');
+  toast(kind === 'income' ? 'Đã thêm thu nhập' : 'Đã thêm chi tiêu');
 }
 
 function updateTxn(id) {
   const amount = parseNum(document.getElementById('txnAmt').value);
   const catId = getSelectedCat();
+  const kind = getSelectedKind();
   const date = document.getElementById('txnDate').value;
   const note = document.getElementById('txnNote').value.trim();
   if (!amount || !catId || !date) return;
@@ -2312,8 +2469,9 @@ function updateTxn(id) {
     if (idx !== -1) {
       state.months[mk].transactions.splice(idx, 1);
       const newMk = date.slice(0,7);
-      const newM = state.months[newMk] || initMonth(newMk);
-      newM.transactions.push({ id, amount, catId, date, note });
+      if (!state.months[newMk]) initMonth(newMk);
+      const newM = state.months[newMk];
+      newM.transactions.push({ id, amount, kind, catId, date, note });
       break;
     }
   }
@@ -2336,31 +2494,45 @@ function deleteTxn(id) {
 }
 
 // ─── CATEGORY MODAL ───
-function openCatModal(editId = null) {
-  const c = editId ? state.categories.find(x => x.id === editId) : null;
+function openCatModal(editId = null, defaultKind = 'flex') {
+  // editId can be a category from either categories or incomeCategories
+  // We detect by checking both arrays
+  let c = null;
+  let isIncome = false;
+  if (editId) {
+    c = state.categories.find(x => x.id === editId);
+    if (!c) {
+      c = state.incomeCategories.find(x => x.id === editId);
+      if (c) isIncome = true;
+    }
+  } else {
+    isIncome = defaultKind === 'income';
+  }
+
+  const currentType = isIncome ? 'income' : (c ? c.type : defaultKind);
+
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${c ? 'Sửa' : 'Thêm'} danh mục</div>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
     <div class="field">
-      <label class="field-label">Tên danh mục</label>
-      <input type="text" id="catName" placeholder="vd: Ăn uống" value="${c ? c.name : ''}">
-    </div>
-    <div class="field-row">
-      <div class="field">
-        <label class="field-label">Icon</label>
-        <input type="text" id="catIcon" placeholder="🍜" maxlength="2" value="${c ? c.icon : '💰'}">
-      </div>
-      <div class="field">
-        <label class="field-label">Loại</label>
-        <select id="catType">
-          <option value="fix" ${c && c.type === 'fix' ? 'selected' : ''}>Cố định</option>
-          <option value="flex" ${c && c.type === 'flex' ? 'selected' : ''}>Linh hoạt</option>
-        </select>
+      <label class="field-label">Loại</label>
+      <div class="toggle-row" id="catKindToggle">
+        <button class="toggle-btn ${currentType === 'fix' ? 'active' : ''}" data-cattype="fix">Chi cố định</button>
+        <button class="toggle-btn ${currentType === 'flex' ? 'active' : ''}" data-cattype="flex">Chi linh hoạt</button>
+        <button class="toggle-btn ${currentType === 'income' ? 'active' : ''}" data-cattype="income">Thu nhập</button>
       </div>
     </div>
     <div class="field">
+      <label class="field-label">Tên danh mục</label>
+      <input type="text" id="catName" placeholder="vd: Ăn uống" value="${c ? c.name : ''}">
+    </div>
+    <div class="field">
+      <label class="field-label">Icon</label>
+      <input type="text" id="catIcon" placeholder="🍜" maxlength="2" value="${c ? c.icon : '💰'}">
+    </div>
+    <div class="field" id="limitField" style="${currentType === 'income' ? 'display:none;' : ''}">
       <label class="field-label">Hạn mức / tháng (VND)</label>
       <div class="input-suffix">
         <input type="text" id="catLimit" inputmode="numeric" placeholder="0" value="${c && c.limit ? fmt(c.limit) : ''}">
@@ -2369,22 +2541,49 @@ function openCatModal(editId = null) {
     </div>
     <button class="btn btn-full" onclick="${c ? `updateCat('${editId}')` : 'addCat()'}">${c ? 'Lưu' : 'Thêm'}</button>
   `);
-  document.getElementById('catLimit').addEventListener('input', (e) => {
-    const v = parseNum(e.target.value);
-    e.target.value = v ? fmt(v) : '';
+
+  document.querySelectorAll('[data-cattype]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-cattype]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Show/hide limit field
+      const isInc = btn.dataset.cattype === 'income';
+      document.getElementById('limitField').style.display = isInc ? 'none' : 'block';
+    });
   });
+
+  const limitInput = document.getElementById('catLimit');
+  if (limitInput) {
+    limitInput.addEventListener('input', (e) => {
+      const v = parseNum(e.target.value);
+      e.target.value = v ? fmt(v) : '';
+    });
+  }
+}
+
+function getSelectedCatType() {
+  const el = document.querySelector('[data-cattype].active');
+  return el ? el.dataset.cattype : 'flex';
 }
 
 function addCat() {
   const name = document.getElementById('catName').value.trim();
   const icon = document.getElementById('catIcon').value.trim() || '💰';
-  const type = document.getElementById('catType').value;
-  const limit = parseNum(document.getElementById('catLimit').value);
+  const type = getSelectedCatType();
   if (!name) return toast('Nhập tên');
-  state.categories.push({
-    id: 'cat_' + Date.now(),
-    name, icon, type, limit
-  });
+
+  if (type === 'income') {
+    state.incomeCategories.push({
+      id: 'inc_' + Date.now(),
+      name, icon
+    });
+  } else {
+    const limit = parseNum(document.getElementById('catLimit').value);
+    state.categories.push({
+      id: 'cat_' + Date.now(),
+      name, icon, type, limit
+    });
+  }
   save();
   closeModal();
   render();
@@ -2393,12 +2592,30 @@ function addCat() {
 function editCat(id) { openCatModal(id); }
 
 function updateCat(id) {
-  const c = state.categories.find(x => x.id === id);
-  if (!c) return;
-  c.name = document.getElementById('catName').value.trim();
-  c.icon = document.getElementById('catIcon').value.trim() || '💰';
-  c.type = document.getElementById('catType').value;
-  c.limit = parseNum(document.getElementById('catLimit').value);
+  const newType = getSelectedCatType();
+  // Find which array the category is in
+  const inExpense = state.categories.find(x => x.id === id);
+  const inIncome = state.incomeCategories.find(x => x.id === id);
+  const name = document.getElementById('catName').value.trim();
+  const icon = document.getElementById('catIcon').value.trim() || '💰';
+
+  // If type changed between income <-> expense, move it
+  if (inExpense && newType === 'income') {
+    state.categories = state.categories.filter(c => c.id !== id);
+    state.incomeCategories.push({ id, name, icon });
+  } else if (inIncome && newType !== 'income') {
+    state.incomeCategories = state.incomeCategories.filter(c => c.id !== id);
+    const limit = parseNum(document.getElementById('catLimit').value);
+    state.categories.push({ id, name, icon, type: newType, limit });
+  } else if (inExpense) {
+    inExpense.name = name;
+    inExpense.icon = icon;
+    inExpense.type = newType;
+    inExpense.limit = parseNum(document.getElementById('catLimit').value);
+  } else if (inIncome) {
+    inIncome.name = name;
+    inIncome.icon = icon;
+  }
   save();
   closeModal();
   render();
@@ -2407,6 +2624,7 @@ function updateCat(id) {
 function deleteCat(id) {
   if (!confirm('Xóa danh mục này? Giao dịch đã ghi vẫn được giữ nhưng sẽ không gán vào đâu.')) return;
   state.categories = state.categories.filter(c => c.id !== id);
+  state.incomeCategories = state.incomeCategories.filter(c => c.id !== id);
   save();
   render();
 }
@@ -2493,6 +2711,49 @@ function updateDebt(id) {
 function toggleDebtPaid(id) {
   const d = state.debts.find(x => x.id === id);
   if (!d) return;
+  // If marking as paid (not yet paid), offer to create transaction
+  if (!d.paid) {
+    const isIncome = d.type === 'in'; // người ta nợ tôi → khi thu thì là thu nhập
+    const label = isIncome ? 'Đã thu' : 'Đã trả';
+    const txnLabel = isIncome ? 'Tạo giao dịch Thu' : 'Tạo giao dịch Chi';
+    if (confirm(`Đánh dấu "${label}"?\n\nBạn có muốn tự động tạo giao dịch ${isIncome ? 'thu nhập' : 'chi tiêu'} ${fmtVND(d.amount)} cho hôm nay không?\n\nOK = Có, tạo giao dịch\nCancel = Không, chỉ đánh dấu`)) {
+      // Create transaction
+      const today = new Date().toISOString().slice(0, 10);
+      const mk = today.slice(0, 7);
+      if (!state.months[mk]) initMonth(mk);
+      const m = state.months[mk];
+
+      // Find or create appropriate category
+      let catId;
+      if (isIncome) {
+        // Try find "Thu nợ" income category, else create
+        let cat = state.incomeCategories.find(c => c.name === 'Thu nợ');
+        if (!cat) {
+          cat = { id: 'inc_repayment_' + Date.now(), name: 'Thu nợ', icon: '🤝' };
+          state.incomeCategories.push(cat);
+        }
+        catId = cat.id;
+      } else {
+        // Find or create "Trả nợ" expense category
+        let cat = state.categories.find(c => c.name === 'Trả nợ');
+        if (!cat) {
+          cat = { id: 'cat_repayment_' + Date.now(), name: 'Trả nợ', icon: '🤝', type: 'flex', limit: 0 };
+          state.categories.push(cat);
+        }
+        catId = cat.id;
+      }
+
+      m.transactions.push({
+        id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        amount: d.amount,
+        kind: isIncome ? 'income' : 'expense',
+        catId,
+        date: today,
+        note: `${isIncome ? 'Thu từ' : 'Trả cho'} ${d.who}${d.note ? ' · ' + d.note : ''}`
+      });
+      toast(`Đã tạo giao dịch ${isIncome ? 'thu' : 'chi'} ${fmtVND(d.amount)}`);
+    }
+  }
   d.paid = !d.paid;
   save();
   render();
@@ -2718,4 +2979,3 @@ document.getElementById('loginEmail').addEventListener('keypress', (e) => {
 </script>
 </body>
 </html>
-
