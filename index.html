@@ -986,15 +986,16 @@ body {
 <section class="view active" id="view-dashboard">
 
   <div class="hero">
-    <div class="hero-label">Còn lại tháng này</div>
+    <div class="hero-label">Số dư hiện tại</div>
     <div class="hero-amount" id="heroRemaining">0<span class="unit">đ</span></div>
+    <div id="heroCarryOver" style="display:none;font-size:12px;opacity:0.7;margin-bottom:14px;position:relative;z-index:1;font-family:var(--font-mono);">Dư từ tháng trước: 0đ</div>
     <div class="hero-stats">
       <div>
-        <div class="hero-stat-label">Thu nhập</div>
+        <div class="hero-stat-label">Thu tháng này</div>
         <div class="hero-stat-value" id="heroSalary">0đ</div>
       </div>
       <div>
-        <div class="hero-stat-label">Đã chi</div>
+        <div class="hero-stat-label">Chi tháng này</div>
         <div class="hero-stat-value" id="heroSpent">0đ</div>
       </div>
     </div>
@@ -1264,7 +1265,7 @@ body {
 
   <div class="card" style="background:var(--surface-elev);">
     <p style="font-size:12px;color:var(--ink-mute);text-align:center;font-family:var(--font-display);font-style:italic;">
-      Finance Hub · built for Harry · v2.1 cloud sync
+      Finance Hub · built for Harry · v2.2 carry-over + savings
     </p>
   </div>
 
@@ -1357,7 +1358,7 @@ function getCurrentMonthKey() {
 function initMonth(mk) {
   if (!state.months[mk]) {
     state.months[mk] = {
-      transactions: [], // {id, date, kind:'expense'|'income', catId, amount, note}
+      transactions: [], // {id, date, kind:'expense'|'income', catId, amount, note, savingId?}
       saveAllocated: 0, // tổng đã đẩy vào các hũ tháng này
     };
   }
@@ -1376,7 +1377,69 @@ function initMonth(mk) {
       if (!t.kind) t.kind = 'expense';
     });
   }
+  // Ensure savings category exists
+  const hasSavingsCat = state.categories.some(c => c.isSavings);
+  if (!hasSavingsCat) {
+    state.categories.push({
+      id: 'savings_deposit',
+      name: 'Bỏ vào tiết kiệm',
+      type: 'flex',
+      icon: '🐷',
+      limit: 0,
+      isSavings: true
+    });
+  }
   return state.months[mk];
+}
+
+// ─── BALANCE HELPERS ───
+function getCarryOver(monthKey) {
+  // Net balance from all months BEFORE monthKey
+  let balance = 0;
+  Object.keys(state.months)
+    .filter(mk => mk < monthKey)
+    .forEach(mk => {
+      const m = state.months[mk];
+      (m.transactions || []).forEach(t => {
+        if (t.kind === 'income') balance += t.amount;
+        else balance -= t.amount;
+      });
+    });
+  return balance;
+}
+
+function getRunningBalance(monthKey) {
+  // Net balance INCLUDING monthKey (running cash up to end of selected month)
+  const carryOver = getCarryOver(monthKey);
+  const m = state.months[monthKey];
+  if (!m) return carryOver;
+  let monthNet = 0;
+  m.transactions.forEach(t => {
+    if (t.kind === 'income') monthNet += t.amount;
+    else monthNet -= t.amount;
+  });
+  return carryOver + monthNet;
+}
+
+// ─── SAVINGS SYNC HELPERS ───
+function applySavingDelta(savingId, amount, fromTxnId, dateStr) {
+  if (!savingId) return;
+  const s = state.savings.find(x => x.id === savingId);
+  if (!s) return;
+  s.current += amount;
+  s.history = s.history || [];
+  s.history.push({ date: dateStr, amount, fromTxnId });
+}
+
+function revertSavingForTxn(txnId) {
+  state.savings.forEach(s => {
+    if (!s.history) return;
+    const idx = s.history.findIndex(h => h.fromTxnId === txnId);
+    if (idx !== -1) {
+      s.current -= s.history[idx].amount;
+      s.history.splice(idx, 1);
+    }
+  });
 }
 
 // Helper to get total income for a month
@@ -1776,11 +1839,22 @@ function renderDashboard() {
   const m = getMonth();
   const income = getTotalIncome();
   const spent = getTotalSpent();
-  const remaining = income - spent;
+  const carryOver = getCarryOver(state.currentMonth);
+  const runningBalance = carryOver + income - spent;
 
-  document.getElementById('heroRemaining').innerHTML = fmt(remaining) + '<span class="unit">đ</span>';
-  document.getElementById('heroSalary').textContent = fmtVND(income);
-  document.getElementById('heroSpent').textContent = fmtVND(spent);
+  document.getElementById('heroRemaining').innerHTML = fmt(runningBalance) + '<span class="unit">đ</span>';
+  document.getElementById('heroSalary').textContent = '+' + fmtVND(income);
+  document.getElementById('heroSpent').textContent = '−' + fmtVND(spent);
+
+  // Carry-over row
+  const carryEl = document.getElementById('heroCarryOver');
+  if (carryOver !== 0) {
+    carryEl.style.display = 'block';
+    const sign = carryOver >= 0 ? '+' : '−';
+    carryEl.textContent = `Dư từ tháng trước: ${sign}${fmtVND(Math.abs(carryOver))}`;
+  } else {
+    carryEl.style.display = 'none';
+  }
 
   // ─── Burn rate / Forecast ───
   renderBurnRate(m, spent, income);
@@ -2078,11 +2152,18 @@ function renderTxnItem(t, showDate = true) {
     ? (state.incomeCategories.find(c => c.id === t.catId) || { name: 'Khác', icon: '✨' })
     : (state.categories.find(c => c.id === t.catId) || { name: 'Khác', icon: '💰' });
   const isIncome = t.kind === 'income';
+  // If saving deposit, append hu name
+  let extraNote = '';
+  if (t.savingId) {
+    const s = state.savings.find(x => x.id === t.savingId);
+    if (s) extraNote = ` → ${s.icon || '🎯'} ${s.name}`;
+  }
+  const noteText = (t.note || '') + extraNote;
   return `<div class="txn-item">
     <div class="txn-icon" style="${isIncome ? 'background:var(--green-soft);' : ''}">${cat.icon}</div>
     <div class="txn-body">
       <div class="txn-cat">${cat.name}</div>
-      <div class="txn-note">${showDate ? fmtDate(t.date) + ' · ' : ''}${t.note || '—'}</div>
+      <div class="txn-note">${showDate ? fmtDate(t.date) + ' · ' : ''}${noteText || '—'}</div>
     </div>
     <div class="txn-amount ${isIncome ? 'income' : ''}" style="${isIncome ? 'color:var(--green);' : ''}">${isIncome ? '+' : '−'}${fmtVND(t.amount)}</div>
     <button class="txn-del" onclick="deleteTxn('${t.id}')">×</button>
@@ -2372,6 +2453,13 @@ function openTxnModal(editId = null, defaultKind = null) {
       <label class="field-label" id="catLabel">Danh mục chi</label>
       <div class="cat-chips" id="catChips"></div>
     </div>
+    <div class="field" id="savingPickerWrapper" style="display:none;">
+      <label class="field-label">Bỏ vào hũ tiết kiệm</label>
+      <select id="savingPicker">
+        <option value="">— Chọn hũ —</option>
+      </select>
+      <div id="noSavingHint" style="display:none;font-size:12px;color:var(--red);margin-top:6px;">Chưa có hũ nào. Tạo hũ ở tab Tiết kiệm trước.</div>
+    </div>
     <div class="field">
       <label class="field-label">Ngày</label>
       <input type="date" id="txnDate" value="${t ? t.date : today}">
@@ -2382,6 +2470,25 @@ function openTxnModal(editId = null, defaultKind = null) {
     </div>
     <button class="btn btn-full" onclick="${t ? `updateTxn('${editId}')` : 'addTxn()'}">${t ? 'Lưu' : 'Thêm giao dịch'}</button>
   `);
+
+  // Populate saving picker dropdown
+  const picker = document.getElementById('savingPicker');
+  state.savings.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.icon || '🎯'} ${s.name}`;
+    if (t && t.savingId === s.id) opt.selected = true;
+    picker.appendChild(opt);
+  });
+
+  function updateSavingPicker(catId) {
+    const cat = state.categories.find(c => c.id === catId);
+    const isSavings = cat && cat.isSavings;
+    const wrapper = document.getElementById('savingPickerWrapper');
+    wrapper.style.display = isSavings ? 'block' : 'none';
+    document.getElementById('noSavingHint').style.display =
+      (isSavings && state.savings.length === 0) ? 'block' : 'none';
+  }
 
   // Render category chips for current kind
   function renderChips(activeKind, selectedCatId) {
@@ -2395,6 +2502,8 @@ function openTxnModal(editId = null, defaultKind = null) {
       chip.addEventListener('click', () => {
         document.querySelectorAll('#catChips .cat-chip').forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
+        // Show/hide saving picker for expense kind
+        if (activeKind === 'expense') updateSavingPicker(chip.dataset.cat);
       });
     });
     const newCatBtn = document.querySelector('#catChips [data-newcat]');
@@ -2404,6 +2513,12 @@ function openTxnModal(editId = null, defaultKind = null) {
         closeModal();
         openCatModal(null, k === 'income' ? 'income' : 'flex');
       });
+    }
+    // Initial check for saving picker visibility (when editing)
+    if (activeKind === 'expense' && selectedCatId) {
+      updateSavingPicker(selectedCatId);
+    } else {
+      document.getElementById('savingPickerWrapper').style.display = 'none';
     }
   }
 
@@ -2443,17 +2558,34 @@ function addTxn() {
   if (!amount) return toast('Nhập số tiền');
   if (!catId) return toast('Chọn danh mục');
   if (!date) return toast('Chọn ngày');
+
+  // If saving category, require a hũ selection
+  const cat = state.categories.find(c => c.id === catId);
+  let savingId = null;
+  if (cat && cat.isSavings && kind === 'expense') {
+    const picker = document.getElementById('savingPicker');
+    savingId = picker ? picker.value : '';
+    if (!savingId) {
+      if (state.savings.length === 0) return toast('Chưa có hũ. Tạo hũ ở tab Tiết kiệm trước.');
+      return toast('Chọn hũ tiết kiệm');
+    }
+  }
+
   const mk = date.slice(0,7);
   if (!state.months[mk]) initMonth(mk);
   const m = state.months[mk];
-  m.transactions.push({
-    id: 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-    amount, kind, catId, date, note
-  });
+  const txnId = 'tx_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  const txn = { id: txnId, amount, kind, catId, date, note };
+  if (savingId) txn.savingId = savingId;
+  m.transactions.push(txn);
+
+  // Apply to saving hũ
+  if (savingId) applySavingDelta(savingId, amount, txnId, date);
+
   save();
   closeModal();
   render();
-  toast(kind === 'income' ? 'Đã thêm thu nhập' : 'Đã thêm chi tiêu');
+  toast(kind === 'income' ? 'Đã thêm thu nhập' : (savingId ? 'Đã bỏ vào hũ tiết kiệm' : 'Đã thêm chi tiêu'));
 }
 
 function updateTxn(id) {
@@ -2463,6 +2595,19 @@ function updateTxn(id) {
   const date = document.getElementById('txnDate').value;
   const note = document.getElementById('txnNote').value.trim();
   if (!amount || !catId || !date) return;
+
+  // Determine new savingId
+  const cat = state.categories.find(c => c.id === catId);
+  let savingId = null;
+  if (cat && cat.isSavings && kind === 'expense') {
+    const picker = document.getElementById('savingPicker');
+    savingId = picker ? picker.value : '';
+    if (!savingId) return toast('Chọn hũ tiết kiệm');
+  }
+
+  // Revert any existing saving deposit for this txn
+  revertSavingForTxn(id);
+
   // Find the transaction across all months and move if needed
   for (const mk of Object.keys(state.months)) {
     const idx = state.months[mk].transactions.findIndex(t => t.id === id);
@@ -2471,10 +2616,16 @@ function updateTxn(id) {
       const newMk = date.slice(0,7);
       if (!state.months[newMk]) initMonth(newMk);
       const newM = state.months[newMk];
-      newM.transactions.push({ id, amount, kind, catId, date, note });
+      const txn = { id, amount, kind, catId, date, note };
+      if (savingId) txn.savingId = savingId;
+      newM.transactions.push(txn);
       break;
     }
   }
+
+  // Apply new saving deposit
+  if (savingId) applySavingDelta(savingId, amount, id, date);
+
   save();
   closeModal();
   render();
@@ -2482,6 +2633,8 @@ function updateTxn(id) {
 
 function deleteTxn(id) {
   if (!confirm('Xóa giao dịch này?')) return;
+  // Revert any savings deposit linked to this txn
+  revertSavingForTxn(id);
   for (const mk of Object.keys(state.months)) {
     const idx = state.months[mk].transactions.findIndex(t => t.id === id);
     if (idx !== -1) {
