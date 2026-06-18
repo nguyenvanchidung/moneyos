@@ -1178,7 +1178,7 @@ body {
   </div>
 
   <!-- Summary card -->
-  <div class="card" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px;">
+  <div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;padding:14px;">
     <div>
       <div style="font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;">Thu</div>
       <div style="font-family:var(--font-display);font-weight:500;font-size:16px;color:var(--green);" id="txnTotalIncome">0đ</div>
@@ -1186,6 +1186,10 @@ body {
     <div>
       <div style="font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;">Chi</div>
       <div style="font-family:var(--font-display);font-weight:500;font-size:16px;color:var(--red);" id="txnTotalExpense">0đ</div>
+    </div>
+    <div>
+      <div style="font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;">Tiết kiệm</div>
+      <div style="font-family:var(--font-display);font-weight:500;font-size:16px;color:var(--blue);" id="txnTotalSavings">0đ</div>
     </div>
     <div>
       <div style="font-size:10px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;">Còn lại</div>
@@ -1265,7 +1269,7 @@ body {
 
   <div class="card" style="background:var(--surface-elev);">
     <p style="font-size:12px;color:var(--ink-mute);text-align:center;font-family:var(--font-display);font-style:italic;">
-      Finance Hub · built for Harry · v2.2 carry-over + savings
+      Finance Hub · built for Harry · v2.3 savings as transfer
     </p>
   </div>
 
@@ -1796,14 +1800,29 @@ function getCategorySpent(catId) {
   return m.transactions.filter(t => t.kind === 'expense' && t.catId === catId).reduce((s, t) => s + t.amount, 0);
 }
 
+// A savings deposit is technically an expense kind, but it's a transfer (money moved to a hu),
+// NOT a real expense. Exclude from all spending calculations.
+function isSavingsTxn(t) {
+  if (!t || t.kind !== 'expense') return false;
+  if (t.savingId) return true;
+  const cat = state.categories.find(c => c.id === t.catId);
+  return !!(cat && cat.isSavings);
+}
+
 function getTotalSpent() {
   const m = getMonth();
-  return m.transactions.filter(t => t.kind === 'expense').reduce((s, t) => s + t.amount, 0);
+  return m.transactions.filter(t => t.kind === 'expense' && !isSavingsTxn(t)).reduce((s, t) => s + t.amount, 0);
+}
+
+function getTotalSavingsDeposits(mk = state.currentMonth) {
+  const m = state.months[mk];
+  if (!m) return 0;
+  return m.transactions.filter(t => isSavingsTxn(t)).reduce((s, t) => s + t.amount, 0);
 }
 
 function getSpentByType(type) {
   const m = getMonth();
-  const ids = state.categories.filter(c => c.type === type).map(c => c.id);
+  const ids = state.categories.filter(c => c.type === type && !c.isSavings).map(c => c.id);
   return m.transactions.filter(t => t.kind === 'expense' && ids.includes(t.catId)).reduce((s, t) => s + t.amount, 0);
 }
 
@@ -1999,7 +2018,7 @@ function renderNetWorth() {
 // ─── Daily spending chart (SVG bar chart) ───
 function renderDailyChart(m) {
   const card = document.getElementById('dailyChartCard');
-  const expenses = m.transactions.filter(t => t.kind === 'expense');
+  const expenses = m.transactions.filter(t => t.kind === 'expense' && !isSavingsTxn(t));
   if (expenses.length === 0) {
     card.style.display = 'none';
     return;
@@ -2046,7 +2065,7 @@ function renderMoM(m, currSpent) {
     return;
   }
   card.style.display = 'block';
-  const prevSpent = prevM.transactions.filter(t => t.kind === 'expense').reduce((s, t) => s + t.amount, 0);
+  const prevSpent = prevM.transactions.filter(t => t.kind === 'expense' && !isSavingsTxn(t)).reduce((s, t) => s + t.amount, 0);
   document.getElementById('momPrev').textContent = fmtVND(prevSpent);
   document.getElementById('momCurr').textContent = fmtVND(currSpent);
 
@@ -2065,7 +2084,7 @@ function renderMoM(m, currSpent) {
 // ─── Top categories ───
 function renderTopCategories(m) {
   const byCategory = {};
-  m.transactions.filter(t => t.kind === 'expense').forEach(t => {
+  m.transactions.filter(t => t.kind === 'expense' && !isSavingsTxn(t)).forEach(t => {
     byCategory[t.catId] = (byCategory[t.catId] || 0) + t.amount;
   });
   const top = Object.entries(byCategory)
@@ -2148,10 +2167,27 @@ function renderDueDebts() {
 }
 
 function renderTxnItem(t, showDate = true) {
-  const cat = t.kind === 'income'
+  const isIncome = t.kind === 'income';
+  const isSavings = isSavingsTxn(t);
+
+  const cat = isIncome
     ? (state.incomeCategories.find(c => c.id === t.catId) || { name: 'Khác', icon: '✨' })
     : (state.categories.find(c => c.id === t.catId) || { name: 'Khác', icon: '💰' });
-  const isIncome = t.kind === 'income';
+
+  // Color treatment: income=green, savings=blue (transfer), expense=red (default)
+  let iconBg = '';
+  let amountColor = '';
+  let prefix = '−';
+  if (isIncome) {
+    iconBg = 'background:var(--green-soft);';
+    amountColor = 'color:var(--green);';
+    prefix = '+';
+  } else if (isSavings) {
+    iconBg = 'background:var(--blue-soft);';
+    amountColor = 'color:var(--blue);';
+    prefix = '−';
+  }
+
   // If saving deposit, append hu name
   let extraNote = '';
   if (t.savingId) {
@@ -2159,13 +2195,14 @@ function renderTxnItem(t, showDate = true) {
     if (s) extraNote = ` → ${s.icon || '🎯'} ${s.name}`;
   }
   const noteText = (t.note || '') + extraNote;
+
   return `<div class="txn-item">
-    <div class="txn-icon" style="${isIncome ? 'background:var(--green-soft);' : ''}">${cat.icon}</div>
+    <div class="txn-icon" style="${iconBg}">${cat.icon}</div>
     <div class="txn-body">
       <div class="txn-cat">${cat.name}</div>
       <div class="txn-note">${showDate ? fmtDate(t.date) + ' · ' : ''}${noteText || '—'}</div>
     </div>
-    <div class="txn-amount ${isIncome ? 'income' : ''}" style="${isIncome ? 'color:var(--green);' : ''}">${isIncome ? '+' : '−'}${fmtVND(t.amount)}</div>
+    <div class="txn-amount" style="${amountColor}">${prefix}${fmtVND(t.amount)}</div>
     <button class="txn-del" onclick="deleteTxn('${t.id}')">×</button>
   </div>`;
 }
@@ -2265,8 +2302,8 @@ function renderAllocate() {
 }
 
 function renderBudget() {
-  const fix = state.categories.filter(c => c.type === 'fix');
-  const flex = state.categories.filter(c => c.type === 'flex');
+  const fix = state.categories.filter(c => c.type === 'fix' && !c.isSavings);
+  const flex = state.categories.filter(c => c.type === 'flex' && !c.isSavings);
   document.getElementById('budgetFixList').innerHTML = fix.length
     ? fix.map(c => renderBudgetItem(c)).join('')
     : '<div class="empty"><div class="empty-text">Chưa có danh mục cố định</div></div>';
@@ -2302,12 +2339,14 @@ function renderTxn() {
 
   // Summary cards
   const totalIncome = getTotalIncome();
-  const totalExpense = getTotalSpent();
-  const net = totalIncome - totalExpense;
-  document.getElementById('txnTotalIncome').textContent = fmtVND(totalIncome);
-  document.getElementById('txnTotalExpense').textContent = fmtVND(totalExpense);
+  const totalExpense = getTotalSpent(); // already excludes savings
+  const totalSavings = getTotalSavingsDeposits();
+  const net = totalIncome - totalExpense - totalSavings;
+  document.getElementById('txnTotalIncome').textContent = '+' + fmtVND(totalIncome);
+  document.getElementById('txnTotalExpense').textContent = '−' + fmtVND(totalExpense);
+  document.getElementById('txnTotalSavings').textContent = '−' + fmtVND(totalSavings);
   const netEl = document.getElementById('txnTotalNet');
-  netEl.textContent = fmtVND(net);
+  netEl.textContent = (net >= 0 ? '+' : '−') + fmtVND(Math.abs(net));
   netEl.style.color = net >= 0 ? 'var(--ink)' : 'var(--red)';
 
   const list = document.getElementById('txnList');
